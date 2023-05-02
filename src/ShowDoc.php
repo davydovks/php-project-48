@@ -2,8 +2,6 @@
 
 namespace Differ\ShowDoc;
 
-require __DIR__.'/../vendor/docopt/docopt/src/docopt.php';
-
 use Docopt;
 
 function getDoc()
@@ -23,7 +21,7 @@ function getDoc()
     
     DOC;
 
-    $result = Docopt::handle($doc, array('version'=>'1.0.0rc2'));
+    $result = Docopt::handle($doc, array('version' => '1.0.0rc2'));
 
     return $result;
 }
