@@ -3,6 +3,12 @@
 
 require_once __DIR__ . "/../vendor/autoload.php";
 
-use function Gendiff\ShowDoc\getDoc;
+use function Differ\ShowDoc\getDoc;
+use function Differ\Differ\genDiff;
 
-getDoc();
+$args = getDoc();
+
+$pathToFile1 = $args['<firstFile>'];
+$pathToFile2 = $args['<secondFile>'];
+
+echo genDiff($pathToFile1, $pathToFile2);
