@@ -1,6 +1,6 @@
 <?php
 
-namespace Gendiff\ShowDoc;
+namespace Differ\ShowDoc;
 
 require __DIR__.'/../vendor/docopt/docopt/src/docopt.php';
 
