@@ -1,5 +1,5 @@
 install:
 	composer install
 
-autoload:
+dump:
 	composer dump-autoload
