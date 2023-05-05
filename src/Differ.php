@@ -4,16 +4,16 @@ namespace Differ\Differ;
 
 function compareJson(array $json1, array $json2, string $key, int $level = 1)
 {
-    $indent = str_repeat(" ", $level * 2);
-    $exists1 = array_key_exists($key, $json1);
-    $exists2 = array_key_exists($key, $json2);
-    if ($exists1) {
+    $indent = str_repeat("  ", $level);
+    $keyExistsInFile1 = array_key_exists($key, $json1);
+    $keyExistsInFile2 = array_key_exists($key, $json2);
+    if ($keyExistsInFile1) {
         $value1 = json_encode($json1[$key]);
     }
-    if ($exists2) {
+    if ($keyExistsInFile2) {
         $value2 = json_encode($json2[$key]);
     }
-    if ($exists1 && $exists2) {
+    if ($keyExistsInFile1 && $keyExistsInFile2) {
         if ($json1[$key] === $json2[$key]) {
             return $indent . "  {$key}: {$value1}\n";
         } else {
@@ -21,7 +21,7 @@ function compareJson(array $json1, array $json2, string $key, int $level = 1)
             $result .= $indent . "+ {$key}: {$value2}\n";
             return $result;
         }
-    } elseif ($exists1) {
+    } elseif ($keyExistsInFile1) {
         return $indent . "- {$key}: {$value1}\n";
     } else {
         return $indent . "+ {$key}: {$value2}\n";
