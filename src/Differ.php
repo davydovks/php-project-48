@@ -2,7 +2,7 @@
 
 namespace Differ\Differ;
 
-use Symfony\Component\Yaml\Yaml;
+use function Differ\Parsers\readFile;
 
 function compareArrays(array $arr1, array $arr2, string $key, int $level = 1)
 {
@@ -30,16 +30,16 @@ function compareArrays(array $arr1, array $arr2, string $key, int $level = 1)
     }
 }
 
-function readFile(string $filename)
+function getKeys(mixed $arr)
 {
-    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-    if ($ext == 'json') {
-        return json_decode(file_get_contents($filename), true);
-    } elseif ($ext == 'yml' || $ext == 'yaml') {
-        return Yaml::parseFile($filename);
-    } else {
-        throw new \Exception("Unknown file format: {$ext}");
-    }
+    return is_object($arr) ? get_object_vars($arr) : array_keys($arr);
+}
+
+function mergeKeys(mixed $arr1, mixed $arr2)
+{
+    $keys = array_unique(array_merge(getKeys($arr1), getKeys($arr2)));
+    sort($keys);
+    return $keys;
 }
 
 function genDiff(string $pathToFile1, string $pathToFile2)
@@ -47,8 +47,7 @@ function genDiff(string $pathToFile1, string $pathToFile2)
     $arrayBefore = readFile($pathToFile1);
     $arrayAfter = readFile($pathToFile2);
 
-    $keys = array_keys(array_merge($arrayBefore, $arrayAfter));
-    sort($keys);
+    $keys = mergeKeys($arrayBefore, $arrayAfter);
 
     $result = '';
     foreach ($keys as $key) {
