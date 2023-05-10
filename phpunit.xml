@@ -10,11 +10,7 @@
   cacheDirectory=".phpunit.cache"
   backupStaticProperties="false"
 >
-  <coverage includeUncoveredFiles="true">
-    <report>
-      <html outputDirectory="html-coverage"/>
-    </report>
-  </coverage>
+  <coverage includeUncoveredFiles="true"/>
   <source>
     <include>
       <directory suffix=".php">./src</directory>
