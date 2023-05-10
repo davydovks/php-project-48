@@ -2,19 +2,21 @@
 
 namespace Differ\Differ;
 
-function compareJson(array $json1, array $json2, string $key, int $level = 1)
+use Symfony\Component\Yaml\Yaml;
+
+function compareArrays(array $arr1, array $arr2, string $key, int $level = 1)
 {
     $indent = str_repeat("  ", $level);
-    $keyExistsInFile1 = array_key_exists($key, $json1);
-    $keyExistsInFile2 = array_key_exists($key, $json2);
+    $keyExistsInFile1 = array_key_exists($key, $arr1);
+    $keyExistsInFile2 = array_key_exists($key, $arr2);
     if ($keyExistsInFile1) {
-        $value1 = json_encode($json1[$key]);
+        $value1 = json_encode($arr1[$key]);
     }
     if ($keyExistsInFile2) {
-        $value2 = json_encode($json2[$key]);
+        $value2 = json_encode($arr2[$key]);
     }
     if ($keyExistsInFile1 && $keyExistsInFile2) {
-        if ($json1[$key] === $json2[$key]) {
+        if ($arr1[$key] === $arr2[$key]) {
             return $indent . "  {$key}: {$value1}\n";
         } else {
             $result = $indent . "- {$key}: {$value1}\n";
@@ -28,17 +30,29 @@ function compareJson(array $json1, array $json2, string $key, int $level = 1)
     }
 }
 
+function readFile(string $filename)
+{
+    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    if ($ext == 'json') {
+        return json_decode(file_get_contents($filename), true);
+    } elseif ($ext == 'yml' || $ext == 'yaml') {
+        return Yaml::parseFile($filename);
+    } else {
+        throw new \Exception("Unknown file format: {$ext}");
+    }
+}
+
 function genDiff(string $pathToFile1, string $pathToFile2)
 {
-    $json1 = json_decode(file_get_contents($pathToFile1), true);
-    $json2 = json_decode(file_get_contents($pathToFile2), true);
+    $arrayBefore = readFile($pathToFile1);
+    $arrayAfter = readFile($pathToFile2);
 
-    $keys = array_keys(array_merge($json1, $json2));
+    $keys = array_keys(array_merge($arrayBefore, $arrayAfter));
     sort($keys);
 
     $result = '';
     foreach ($keys as $key) {
-        $result .= compareJson($json1, $json2, $key);
+        $result .= compareArrays($arrayBefore, $arrayAfter, $key);
     }
 
     return "{\n" . $result . "}\n";
