@@ -4,4 +4,5 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/00cecdd036295d3f8eb7/test_coverage)](https://codeclimate.com/github/davydovks/php-project-48/test_coverage)
 ### Asciinema Recordings
 Step 3: https://asciinema.org/a/581932
+
 Step 5: https://asciinema.org/a/583851
