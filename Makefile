@@ -12,4 +12,4 @@ test:
 
 test-coverage:
 	XDEBUG_MODE=coverage
-	composer exec --verbose phpunit tests -- --coverage-clover build/logs/clover.xml
+	composer exec --verbose phpunit tests -- --coverage-html html-coverage
