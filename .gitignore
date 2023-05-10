@@ -1,3 +1,4 @@
 /vendor/
+/html-coverage/
 *.bak
 *.cache
