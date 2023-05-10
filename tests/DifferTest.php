@@ -13,12 +13,22 @@ class DifferTest extends TestCase
         return realpath(implode('/', $parts));
     }
 
-    public function testGenDiff(): void
+    public function testJsonDiff(): void
     {
         $JSONFile1 = $this->getFixtureFullPath('file1.json');
         $JSONFile2 = $this->getFixtureFullPath('file2.json');
         $expected = $this->getFixtureFullPath('output.txt');
         $actual = genDiff($JSONFile1, $JSONFile2);
+
+        $this->assertStringEqualsFile($expected, $actual);
+    }
+
+    public function testYamlDiff(): void
+    {
+        $file1 = $this->getFixtureFullPath('file1.yml');
+        $file2 = $this->getFixtureFullPath('file2.yml');
+        $expected = $this->getFixtureFullPath('output.txt');
+        $actual = genDiff($file1, $file2);
 
         $this->assertStringEqualsFile($expected, $actual);
     }
