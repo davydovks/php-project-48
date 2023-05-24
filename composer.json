@@ -7,7 +7,8 @@
         "files": [
             "src/ShowDoc.php",
             "src/Differ.php",
-            "src/Parsers.php"
+            "src/Parsers.php",
+            "src/Formatters.php"
         ]
     },
     "authors": [
