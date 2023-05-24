@@ -7,7 +7,7 @@ use Docopt;
 function getDoc()
 {
     $doc = <<<DOC
-    Generate diff
+    Compares two configuration files and shows a difference.
 
     Usage:
       gendiff (-h|--help)
@@ -15,9 +15,9 @@ function getDoc()
       gendiff [--format <fmt>] <firstFile> <secondFile>
     
     Options:
-      -h --help                     Show this screen
-      -v --version                  Show version
-      --format <fmt>                Report format [default: stylish]
+      -h, --help                    Show this screen
+      -V, --version                 Show version
+      -f, --format <fmt>            Report format [default: stylish]
     
     DOC;
 
