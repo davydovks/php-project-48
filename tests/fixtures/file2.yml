@@ -16,5 +16,6 @@ group1:
   nest: str
 group3:
   deep: 
-    id: 45
+    id: 
+      number: 45
   fee: 100500
