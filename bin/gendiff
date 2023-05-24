@@ -5,10 +5,16 @@ require_once __DIR__ . "/../vendor/autoload.php";
 
 use function Differ\ShowDoc\getDoc;
 use function Differ\Differ\genDiff;
+use function Differ\Formatters\genOutput;
 
 $args = getDoc();
 
 $pathToFile1 = $args['<firstFile>'];
 $pathToFile2 = $args['<secondFile>'];
+$format = $args['--format'];
 
-echo genDiff($pathToFile1, $pathToFile2);
+$diff = genDiff($pathToFile1, $pathToFile2);
+
+$output = genOutput($diff, $format);
+
+echo $output;
