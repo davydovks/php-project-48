@@ -32,7 +32,7 @@ function toString($value)
         return trim(var_export($value, true), "'");
     }
 
-    return json_encode($value, JSON_PRETTY_PRINT);
+    return json_encode($value/*, JSON_PRETTY_PRINT*/);
 }
 
 function markLine($str, $mark, $indent)
@@ -42,11 +42,52 @@ function markLine($str, $mark, $indent)
     return $str;
 }
 
+function getIndent(int $depth)
+{
+    return str_repeat('    ', $depth);
+}
+
+function getArrayLines(array $array, int $depth)
+{
+    $result = [];
+    $indent = getIndent($depth);
+    foreach ($array as $key => $value) {
+        if (is_array($value)) {
+            $result[] = "{$indent}{$key}: {";
+            $result = array_merge($result, getArrayLines($value, $depth + 1));
+            $result[] = "{$indent}}";
+        } else {
+            $result[] = "{$indent}{$key}: {$value}";
+        }
+    }
+    return $result;
+}
+
+function addLine($item, &$acc, $depth, $mark = ' ')
+{
+    $rawValue = $mark === '+' ? getValueAfter($item) : getValueBefore($item);
+    $indent = getIndent($depth);
+    $key = getKey($item);
+    
+    if (is_array($rawValue)) {
+        $acc[] = markLine("{$indent}{$key}: {", $mark, $indent);
+        $arrayLines = getArrayLines($rawValue, $depth + 1);
+        $acc = [...$acc, ...$arrayLines];
+        $acc[] = "{$indent}}";
+    } else {
+        $value = toString($rawValue);
+        $line = markLine("{$indent}{$key}: {$value}", $mark, $indent);
+        $acc[] = $line;
+    }
+
+    return $acc;
+}
+
 function stylish(array $diff): string
 {
     $iter = function (array $coll, int $depth) use (&$iter) {
         return array_reduce($coll, function ($acc, $item) use ($depth, &$iter) {
-            $indent = str_repeat('    ', $depth);
+            $indent = getIndent($depth);
             $key = getKey($item);
 
             if (hasChildren($item)) {
@@ -58,32 +99,24 @@ function stylish(array $diff): string
             }
 
             if (isTheSame($item)) {
-                $value = toString(getValueBefore($item));
-                $acc[] = "{$indent}{$key}: {$value}";
-                return $acc;
+                return addLine($item, $acc, $depth);
             }
 
             if (isChanged($item)) {
-                $value1 = toString(getValueBefore($item));
-                $line1 = markLine("{$indent}{$key}: {$value1}", '-', $indent);
-                $value2 = toString(getValueAfter($item));
-                $line2 = markLine("{$indent}{$key}: {$value2}", '+', $indent);
-                return [...$acc, $line1, $line2];
+                addLine($item, $acc, $depth, '-');
+                addLine($item, $acc, $depth, '+');
+                return $acc;
             }
 
             if (isAdded($item)) {
-                $value = toString(getValueAfter($item));
-                $line = markLine("{$indent}{$key}: {$value}", '+', $indent);
-                return [...$acc, $line];
+                return addLine($item, $acc, $depth, '+');
             }
 
             if (isDeleted($item)) {
-                $value = toString(getValueBefore($item));
-                $line = markLine("{$indent}{$key}: {$value}", '-', $indent);
-                return [...$acc, $line];
+                return addLine($item, $acc, $depth, '-');
             }
 
-            throw new \LogicException('Error in element with key: ' . getKey($item));
+            throw new \LogicException('Error in element with key: ' . $key);
         }, []);
     };
 
