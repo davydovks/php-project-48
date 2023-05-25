@@ -13,7 +13,7 @@ class DifferTest extends TestCase
         return realpath(implode('/', $parts));
     }
 
-    public function testJsonDiff(): void
+    public function testStylishFromJson(): void
     {
         $JSONFile1 = $this->getFixtureFullPath('file1.json');
         $JSONFile2 = $this->getFixtureFullPath('file2.json');
@@ -23,7 +23,7 @@ class DifferTest extends TestCase
         $this->assertStringEqualsFile($expected, $actual);
     }
 
-    public function testYamlDiff(): void
+    public function testStylishFromYaml(): void
     {
         $file1 = $this->getFixtureFullPath('file1.yml');
         $file2 = $this->getFixtureFullPath('file2.yml');
@@ -33,7 +33,7 @@ class DifferTest extends TestCase
         $this->assertStringEqualsFile($expected, $actual);
     }
 
-    public function testMixedDiff(): void
+    public function testStylishFromMixed(): void
     {
         $file1 = $this->getFixtureFullPath('file1.yml');
         $file2 = $this->getFixtureFullPath('file2.json');
@@ -43,7 +43,7 @@ class DifferTest extends TestCase
         $this->assertStringEqualsFile($expected, $actual);
     }
 
-    public function testDefaultFormat(): void
+    public function testStylishAsDefault(): void
     {
         $file1 = $this->getFixtureFullPath('file1.yml');
         $file2 = $this->getFixtureFullPath('file2.yml');
@@ -53,12 +53,22 @@ class DifferTest extends TestCase
         $this->assertStringEqualsFile($expected, $actual);
     }
 
-    public function testMixedPlainDiff(): void
+    public function testPlainFromMixed(): void
     {
         $file1 = $this->getFixtureFullPath('file1.yml');
         $file2 = $this->getFixtureFullPath('file2.json');
         $expected = $this->getFixtureFullPath('expectedPlain.txt');
         $actual = genDiff($file1, $file2, 'plain');
+
+        $this->assertStringEqualsFile($expected, $actual);
+    }
+
+    public function testJSONFromMixed(): void
+    {
+        $file1 = $this->getFixtureFullPath('file1.yml');
+        $file2 = $this->getFixtureFullPath('file2.json');
+        $expected = $this->getFixtureFullPath('expectedJson.txt');
+        $actual = genDiff($file1, $file2, 'json');
 
         $this->assertStringEqualsFile($expected, $actual);
     }
