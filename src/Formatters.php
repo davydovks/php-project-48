@@ -32,7 +32,7 @@ function toString($value)
         return trim(var_export($value, true), "'");
     }
 
-    return json_encode($value/*, JSON_PRETTY_PRINT*/);
+    return json_encode($value);
 }
 
 function markLine($str, $mark, $indent)
@@ -49,36 +49,32 @@ function getIndent(int $depth)
 
 function getArrayLines(array $array, int $depth)
 {
-    $result = [];
-    $indent = getIndent($depth);
     foreach ($array as $key => $value) {
-        if (is_array($value)) {
-            $result[] = "{$indent}{$key}: {";
-            $result = array_merge($result, getArrayLines($value, $depth + 1));
-            $result[] = "{$indent}}";
-        } else {
-            $result[] = "{$indent}{$key}: {$value}";
-        }
+        addLines($key, $value, $acc, $depth, ' ');
     }
-    return $result;
+    return $acc;
 }
 
-function addLine($item, &$acc, $depth, $mark = ' ')
+function addLines($key, $value, &$acc, $depth, $mark)
 {
-    $rawValue = $mark === '+' ? getValueAfter($item) : getValueBefore($item);
     $indent = getIndent($depth);
-    $key = getKey($item);
-    
-    if (is_array($rawValue)) {
+
+    if (is_array($value)) {
         $acc[] = markLine("{$indent}{$key}: {", $mark, $indent);
-        $arrayLines = getArrayLines($rawValue, $depth + 1);
-        $acc = [...$acc, ...$arrayLines];
+        $acc = array_merge($acc, getArrayLines($value, $depth + 1));
         $acc[] = "{$indent}}";
     } else {
-        $value = toString($rawValue);
-        $line = markLine("{$indent}{$key}: {$value}", $mark, $indent);
-        $acc[] = $line;
+        $strigifiedValue = toString($value);
+        $acc[] = markLine("{$indent}{$key}: {$strigifiedValue}", $mark, $indent);
     }
+
+    return $acc;
+}
+
+function addItem($item, &$acc, $depth, $mark = ' ')
+{
+    $value = $mark === '+' ? getValueAfter($item) : getValueBefore($item);
+    addLines(getKey($item), $value, $acc, $depth, $mark);
 
     return $acc;
 }
@@ -99,21 +95,21 @@ function stylish(array $diff): string
             }
 
             if (isTheSame($item)) {
-                return addLine($item, $acc, $depth);
+                return addItem($item, $acc, $depth);
             }
 
             if (isChanged($item)) {
-                addLine($item, $acc, $depth, '-');
-                addLine($item, $acc, $depth, '+');
+                addItem($item, $acc, $depth, '-');
+                addItem($item, $acc, $depth, '+');
                 return $acc;
             }
 
             if (isAdded($item)) {
-                return addLine($item, $acc, $depth, '+');
+                return addItem($item, $acc, $depth, '+');
             }
 
             if (isDeleted($item)) {
-                return addLine($item, $acc, $depth, '-');
+                return addItem($item, $acc, $depth, '-');
             }
 
             throw new \LogicException('Error in element with key: ' . $key);
@@ -127,5 +123,5 @@ function stylish(array $diff): string
 
 function plain(array $diff)
 {
-
+//insert code here
 }
