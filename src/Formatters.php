@@ -12,7 +12,7 @@ use function Differ\Differ\isAdded;
 use function Differ\Differ\getValueBefore;
 use function Differ\Differ\getValueAfter;
 
-function genOutput(array $diff, string $format)
+function genOutputFromDiff(array $diff, string $format)
 {
     switch ($format) {
         case 'stylish':

@@ -4,7 +4,6 @@ namespace Differ\Differ\Tests;
 
 use PHPUnit\Framework\TestCase;
 use function Differ\Differ\genDiff;
-use function Differ\Formatters\genOutput;
 
 class DifferTest extends TestCase
 {
@@ -19,8 +18,7 @@ class DifferTest extends TestCase
         $JSONFile1 = $this->getFixtureFullPath('file1.json');
         $JSONFile2 = $this->getFixtureFullPath('file2.json');
         $expected = $this->getFixtureFullPath('expectedStylish.txt');
-        $diff = genDiff($JSONFile1, $JSONFile2);
-        $actual = genOutput($diff, 'stylish');
+        $actual = genDiff($JSONFile1, $JSONFile2, 'stylish');
 
         $this->assertStringEqualsFile($expected, $actual);
     }
@@ -30,8 +28,7 @@ class DifferTest extends TestCase
         $file1 = $this->getFixtureFullPath('file1.yml');
         $file2 = $this->getFixtureFullPath('file2.yml');
         $expected = $this->getFixtureFullPath('expectedStylish.txt');
-        $diff = genDiff($file1, $file2);
-        $actual = genOutput($diff, 'stylish');
+        $actual = genDiff($file1, $file2, 'stylish');
 
         $this->assertStringEqualsFile($expected, $actual);
     }

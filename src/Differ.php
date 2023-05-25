@@ -2,6 +2,7 @@
 
 namespace Differ\Differ;
 
+use function Differ\Formatters\genOutputFromDiff;
 use function Differ\Parsers\readFile;
 
 function getKeys(mixed $arr)
@@ -23,33 +24,35 @@ function bothHaveArraysByKey(array $arr1, array $arr2, $key)
     return $firstIsArray && $secondIsArray;
 }
 
-function createDiff(array $arrayFirst, array $arraySecond)
+function createDiff(array $arrayBefore, array $arrayAfter)
 {
-    $keys = mergeKeys($arrayFirst, $arraySecond);
-    return array_map(function ($key) use ($arrayFirst, $arraySecond) {
+    $keys = mergeKeys($arrayBefore, $arrayAfter);
+    return array_map(function ($key) use ($arrayBefore, $arrayAfter) {
         $result = ['key' => $key];
-        if (bothHaveArraysByKey($arrayFirst, $arraySecond, $key)) {
-            $result['children'] = createDiff($arrayFirst[$key], $arraySecond[$key]);
+        if (bothHaveArraysByKey($arrayBefore, $arrayAfter, $key)) {
+            $result['children'] = createDiff($arrayBefore[$key], $arrayAfter[$key]);
             return $result;
         }
 
-        if (array_key_exists($key, $arrayFirst)) {
-            $result['valueBefore'] = $arrayFirst[$key];
+        if (array_key_exists($key, $arrayBefore)) {
+            $result['valueBefore'] = $arrayBefore[$key];
         }
-        if (array_key_exists($key, $arraySecond)) {
-            $result['valueAfter'] = $arraySecond[$key];
+        if (array_key_exists($key, $arrayAfter)) {
+            $result['valueAfter'] = $arrayAfter[$key];
         }
 
         return $result;
     }, $keys);
 }
 
-function genDiff(string $pathToFile1, string $pathToFile2)
+function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'stylish')
 {
     $arrayBefore = readFile($pathToFile1);
     $arrayAfter = readFile($pathToFile2);
 
-    return createDiff($arrayBefore, $arrayAfter);
+    $diff = createDiff($arrayBefore, $arrayAfter);
+
+    return genOutputFromDiff($diff, $format);
 }
 
 /**
