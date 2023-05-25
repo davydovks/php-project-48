@@ -32,4 +32,25 @@ class DifferTest extends TestCase
 
         $this->assertStringEqualsFile($expected, $actual);
     }
+
+    public function testMixedDiff(): void
+    {
+        $file1 = $this->getFixtureFullPath('file1.yml');
+        $file2 = $this->getFixtureFullPath('file2.json');
+        $expected = $this->getFixtureFullPath('expectedStylish.txt');
+        $actual = genDiff($file1, $file2, 'stylish');
+
+        $this->assertStringEqualsFile($expected, $actual);
+    }
+
+    public function testDefaultFormat(): void
+    {
+        $file1 = $this->getFixtureFullPath('file1.yml');
+        $file2 = $this->getFixtureFullPath('file2.yml');
+        $expected = $this->getFixtureFullPath('expectedStylish.txt');
+        $actual = genDiff($file1, $file2);
+
+        $this->assertStringEqualsFile($expected, $actual);
+    }
+
 }
