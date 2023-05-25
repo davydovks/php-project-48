@@ -122,7 +122,7 @@ function stylish(array $diff): string
 
     $lines = $iter($diff, 1);
 
-    return implode(PHP_EOL, ['{', ...$lines, '}', '']);
+    return implode(PHP_EOL, ['{', ...$lines, '}']);
 }
 
 function plain(array $diff)
