@@ -10,9 +10,7 @@ function getDoc()
     Compares two configuration files and shows a difference.
 
     Usage:
-      gendiff (-h|--help)
-      gendiff (-v|--version)
-      gendiff [-f|--format <fmt>] <firstFile> <secondFile>
+      gendiff [options] <firstFile> <secondFile>
     
     Options:
       -h, --help                    Show this screen
