@@ -11,7 +11,15 @@ use function Differ\Differ\isDeleted;
 use function Differ\Differ\isAdded;
 use function Differ\Differ\getValueBefore;
 use function Differ\Differ\getValueAfter;
-use function Differ\Formatters\toString;
+
+function toStringStylish($value)
+{
+    if (is_string($value)) {
+        return trim(var_export($value, true), "'");
+    }
+
+    return json_encode($value);
+}
 
 function markLine($str, $mark, $indent)
 {
@@ -42,7 +50,7 @@ function addLines($key, $value, &$acc, $depth, $mark)
         $acc = array_merge($acc, getArrayLines($value, $depth + 1));
         $acc[] = "{$indent}}";
     } else {
-        $strigifiedValue = toString($value);
+        $strigifiedValue = toStringStylish($value);
         $acc[] = markLine("{$indent}{$key}: {$strigifiedValue}", $mark, $indent);
     }
 

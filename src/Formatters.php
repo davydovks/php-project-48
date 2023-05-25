@@ -18,12 +18,3 @@ function genOutputFromDiff(array $diff, string $format)
             throw new \Exception('Unknown format: ' . $format);
     }
 }
-
-function toString($value)
-{
-    if (is_string($value)) {
-        return trim(var_export($value, true), "'");
-    }
-
-    return json_encode($value);
-}
