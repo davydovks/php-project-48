@@ -16,7 +16,7 @@ function getDoc()
     
     Options:
       -h, --help                    Show this screen
-      -V, --version                 Show version
+      -v, --version                 Show version
       -f, --format <fmt>            Report format [default: stylish]
     
     DOC;
