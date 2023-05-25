@@ -56,8 +56,9 @@ function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'sty
 }
 
 /**
- * Interface
+ * Interface functions
  */
+
 function getKey($item)
 {
     return $item['key'];
