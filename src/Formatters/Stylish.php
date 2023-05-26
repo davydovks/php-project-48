@@ -35,8 +35,8 @@ function getIndent(int $depth)
 function getArrayLines(array $array, int $depth)
 {
     return array_reduce(
-        array_keys($array), 
-        fn($acc, $key) => addLines($key, $array[$key], $acc, $depth, ' '), 
+        array_keys($array),
+        fn($acc, $key) => addLines($key, $array[$key], $acc, $depth, ' '),
         []
     );
 }
