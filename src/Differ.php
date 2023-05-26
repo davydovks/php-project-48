@@ -91,19 +91,19 @@ function setChildren(array $item, array $children)
 function setValueBefore(array $item, mixed $value)
 {
     $property = ['valueBefore' => $value];
-    return array_merge ($item, $property);
+    return array_merge($item, $property);
 }
 
 function setValueAfter(array $item, mixed $value)
 {
     $property = ['valueAfter' => $value];
-    return array_merge ($item, $property);
+    return array_merge($item, $property);
 }
 
 function hasChildren(array $item)
 {
     return array_key_exists('children', $item);
-}    
+}
 
 function isTheSame(array $item)
 {
