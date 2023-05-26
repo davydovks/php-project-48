@@ -11,7 +11,7 @@ function readFile(string $filename)
         $fileContent = file_get_contents($filename);
         return json_decode($fileContent, true);
     } elseif ($ext == 'yml' || $ext == 'yaml') {
-        return Yaml::parseFile($filename/*, Yaml::PARSE_OBJECT_FOR_MAP*/);
+        return Yaml::parseFile($filename);
     } else {
         throw new \Exception("Unknown file format: {$ext}");
     }
