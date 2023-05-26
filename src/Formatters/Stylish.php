@@ -12,7 +12,7 @@ use function Differ\Differ\isAdded;
 use function Differ\Differ\getValueBefore;
 use function Differ\Differ\getValueAfter;
 
-function toStringStylish(mixed $value)
+function toString(mixed $value)
 {
     if (is_string($value)) {
         return trim(var_export($value, true), "'");
@@ -43,15 +43,13 @@ function getArrayLines(array $array, int $depth)
 
 function addLines(string $key, mixed $value, array $acc, int $depth, string $mark)
 {
-    $indent = getIndent($depth);
-
     if (is_array($value)) {
-        $firstLine = markLine("{$indent}{$key}: {", $mark, $indent);
-        $lines = getArrayLines($value, $depth + 1);
-        $lastLine = "{$indent}}";
-        return [...$acc, $firstLine, ...$lines, $lastLine];
+        $innerLines = getArrayLines($value, $depth + 1);
+        $addedLines = addStructure($innerLines, $key, $depth, $mark);
+        return [...$acc, ...$addedLines];
     } else {
-        $strigifiedValue = toStringStylish($value);
+        $indent = getIndent($depth);
+        $strigifiedValue = toString($value);
         $newLine = markLine("{$indent}{$key}: {$strigifiedValue}", $mark, $indent);
         return [...$acc, $newLine];
     }
@@ -63,19 +61,26 @@ function addItem(array $item, array $acc, int $depth, string $mark = ' ')
     return addLines(getKey($item), $value, $acc, $depth, $mark);
 }
 
+function addStructure(array $innerLines, string $key, int $depth, string $mark = ' ')
+{
+    $indent = getIndent($depth);
+
+    $firstLine = markLine("{$indent}{$key}: {", $mark, $indent);
+    $lastLine = "{$indent}}";
+
+    return [$firstLine, ...$innerLines, $lastLine];
+}
+
 function stylish(array $diff): string
 {
     $iter = function (array $coll, int $depth) use (&$iter) {
         return array_reduce($coll, function ($acc, $item) use ($depth, &$iter) {
-            $indent = getIndent($depth);
             $key = getKey($item);
 
             if (hasChildren($item)) {
-                $acc[] = "{$indent}{$key}: {";
-                $childrenLines = $iter(getChildren($item), $depth + 1);
-                $acc = [...$acc, ...$childrenLines];
-                $acc[] = "{$indent}}";
-                return $acc;
+                $innerLines = $iter(getChildren($item), $depth + 1);
+                $addedLines = addStructure($innerLines, $key, $depth);
+                return array_merge($acc, $addedLines);
             }
 
             if (isTheSame($item)) {
