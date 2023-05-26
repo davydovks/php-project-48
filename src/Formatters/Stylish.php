@@ -104,5 +104,5 @@ function stylish(array $diff): string
 
     $lines = $iter($diff, 1);
 
-    return implode(PHP_EOL, ['{', ...$lines, '}']) . PHP_EOL;
+    return implode(PHP_EOL, ['{', ...$lines, '}']);
 }
