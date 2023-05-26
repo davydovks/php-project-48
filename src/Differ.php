@@ -17,7 +17,7 @@ function mergeKeys(mixed $arr1, mixed $arr2)
     return $keys;
 }
 
-function bothHaveArraysByKey(array $arr1, array $arr2, $key)
+function bothHaveArraysByKey(array $arr1, array $arr2, string $key)
 {
     $firstIsArray = isset($arr1[$key]) && is_array($arr1[$key]);
     $secondIsArray = isset($arr2[$key]) && is_array($arr2[$key]);
@@ -59,53 +59,53 @@ function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'sty
  * Interface functions
  */
 
-function getKey($item)
+function getKey(array $item)
 {
     return $item['key'];
 }
 
-function hasChildren($item)
+function hasChildren(array $item)
 {
     return array_key_exists('children', $item);
 }
 
-function getChildren($item)
+function getChildren(array $item)
 {
     return $item['children'];
 }
 
-function isTheSame($item)
+function isTheSame(array $item)
 {
     return array_key_exists('valueBefore', $item)
         && array_key_exists('valueAfter', $item)
         && $item['valueBefore'] === $item['valueAfter'];
 }
 
-function isChanged($item)
+function isChanged(array $item)
 {
     return array_key_exists('valueBefore', $item)
         && array_key_exists('valueAfter', $item)
         && $item['valueBefore'] !== $item['valueAfter'];
 }
 
-function isDeleted($item)
+function isDeleted(array $item)
 {
     return array_key_exists('valueBefore', $item)
         && !array_key_exists('valueAfter', $item);
 }
 
-function isAdded($item)
+function isAdded(array $item)
 {
     return !array_key_exists('valueBefore', $item)
         && array_key_exists('valueAfter', $item);
 }
 
-function getValueBefore($item)
+function getValueBefore(array $item)
 {
     return $item['valueBefore'];
 }
 
-function getValueAfter($item)
+function getValueAfter(array $item)
 {
     return $item['valueAfter'];
 }

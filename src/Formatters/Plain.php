@@ -11,7 +11,7 @@ use function Differ\Differ\isAdded;
 use function Differ\Differ\getValueBefore;
 use function Differ\Differ\getValueAfter;
 
-function toStringPlain($value)
+function toStringPlain(mixed $value)
 {
     if (is_array($value)) {
         return '[complex value]';
@@ -24,12 +24,12 @@ function toStringPlain($value)
     return json_encode($value);
 }
 
-function getProperty($stack)
+function getProperty(array $stack)
 {
     return implode('.', $stack);
 }
 
-function getLineChanged($item, $stack)
+function getLineChanged(array $item, array $stack)
 {
     $property = getProperty($stack);
     $old = toStringPlain(getValueBefore($item));
@@ -37,14 +37,14 @@ function getLineChanged($item, $stack)
     return "Property '{$property}' was updated. From {$old} to {$new}";
 }
 
-function getLineAdded($item, $stack)
+function getLineAdded(array $item, array $stack)
 {
     $property = getProperty($stack);
     $value = toStringPlain(getValueAfter($item));
     return "Property '{$property}' was added with value: {$value}";
 }
 
-function getLineRemoved($stack)
+function getLineRemoved(array $stack)
 {
     $property = getProperty($stack);
     return "Property '{$property}' was removed";
@@ -53,7 +53,7 @@ function getLineRemoved($stack)
 function plain(array $diff)
 {
     $iter = function ($coll, array $parentElem) use (&$iter) {
-        return array_reduce($coll, function (array $acc, $item) use ($coll, &$iter, $parentElem) {
+        return array_reduce($coll, function (array $acc, $item) use (&$iter, $parentElem) {
             $key = getKey($item);
             $currentElem = [...$parentElem, $key];
 

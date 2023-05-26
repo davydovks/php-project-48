@@ -12,7 +12,7 @@ use function Differ\Differ\isAdded;
 use function Differ\Differ\getValueBefore;
 use function Differ\Differ\getValueAfter;
 
-function toStringStylish($value)
+function toStringStylish(mixed $value)
 {
     if (is_string($value)) {
         return trim(var_export($value, true), "'");
@@ -21,7 +21,7 @@ function toStringStylish($value)
     return json_encode($value);
 }
 
-function markLine($str, $mark, $indent)
+function markLine(string $str, string $mark, string $indent)
 {
     $pos = strlen($indent) - 2;
     $str[$pos] = $mark;
@@ -35,13 +35,14 @@ function getIndent(int $depth)
 
 function getArrayLines(array $array, int $depth)
 {
+    $acc = [];
     foreach ($array as $key => $value) {
         addLines($key, $value, $acc, $depth, ' ');
     }
     return $acc;
 }
 
-function addLines($key, $value, &$acc, $depth, $mark)
+function addLines(string $key, mixed $value, array &$acc, int $depth, string $mark)
 {
     $indent = getIndent($depth);
 
@@ -57,7 +58,7 @@ function addLines($key, $value, &$acc, $depth, $mark)
     return $acc;
 }
 
-function addItem($item, &$acc, $depth, $mark = ' ')
+function addItem(array $item, array &$acc, int $depth, string $mark = ' ')
 {
     $value = $mark === '+' ? getValueAfter($item) : getValueBefore($item);
     addLines(getKey($item), $value, $acc, $depth, $mark);
