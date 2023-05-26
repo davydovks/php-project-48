@@ -27,24 +27,18 @@ function bothHaveArraysByKey(array $arr1, array $arr2, string $key)
 function createDiff(array $arrayBefore, array $arrayAfter)
 {
     return array_map(function ($key) use ($arrayBefore, $arrayAfter) {
-        $result = ['key' => $key];
+        $keyProperty = setKey($key);
+
         if (bothHaveArraysByKey($arrayBefore, $arrayAfter, $key)) {
-            $children = createDiff($arrayBefore[$key], $arrayAfter[$key]);
-            //$result['children'] = createDiff($arrayBefore[$key], $arrayAfter[$key]);
-            return setChildren($result, $children);
+            $children = setChildren(createDiff($arrayBefore[$key], $arrayAfter[$key]));
+            return array_merge($keyProperty, $children);
         }
 
-        if (array_key_exists($key, $arrayBefore)) {
-            //$newItem = ['valueBefore' => $arrayBefore[$key]];
-            //$result['valueBefore'] = $arrayBefore[$key];
-            $result = setValueBefore($result, $arrayBefore[$key]);
-        }
-        if (array_key_exists($key, $arrayAfter)) {
-            //$result['valueAfter'] = $arrayAfter[$key];
-            $result = setValueAfter($result, $arrayAfter[$key]);
-        }
-
-        return $result;
+        $valueBefore = array_key_exists($key, $arrayBefore) ?
+            setValueBefore($arrayBefore[$key]) : [];
+        $valueAfter = array_key_exists($key, $arrayAfter) ?
+            setValueAfter($arrayAfter[$key]) : [];
+        return array_merge($keyProperty, $valueBefore, $valueAfter);
     }, mergeKeys($arrayBefore, $arrayAfter));
 }
 
@@ -82,22 +76,24 @@ function getValueAfter(array $item)
     return $item['valueAfter'];
 }
 
-function setChildren(array $item, array $children)
+function setKey(string $key)
 {
-    $property = ['children' => $children];
-    return array_merge($item, $property);
+    return ['key' => $key];
 }
 
-function setValueBefore(array $item, mixed $value)
+function setChildren(array $children)
 {
-    $property = ['valueBefore' => $value];
-    return array_merge($item, $property);
+    return ['children' => $children];
 }
 
-function setValueAfter(array $item, mixed $value)
+function setValueBefore(mixed $value)
 {
-    $property = ['valueAfter' => $value];
-    return array_merge($item, $property);
+    return ['valueBefore' => $value];
+}
+
+function setValueAfter(mixed $value)
+{
+    return ['valueAfter' => $value];
 }
 
 function hasChildren(array $item)
