@@ -10,3 +10,5 @@ Step 5: https://asciinema.org/a/583851
 Step 6: https://asciinema.org/a/587283
 
 Step 7: https://asciinema.org/a/587351
+
+Step 8: https://asciinema.org/a/587524
