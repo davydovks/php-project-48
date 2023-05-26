@@ -68,7 +68,7 @@ class DifferTest extends TestCase
     {
         $file1 = $this->getFixtureFullPath('file1.yml');
         $file2 = $this->getFixtureFullPath('file2.json');
-        $expected = $this->getFixtureFullPath('expectedJson.txt');
+        $expected = $this->getFixtureFullPath('expectedJson.json');
         $actual = genDiff($file1, $file2, 'json');
 
         $this->assertStringEqualsFile($expected, $actual);
