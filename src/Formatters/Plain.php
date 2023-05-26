@@ -82,5 +82,5 @@ function plain(array $diff)
 
     $lines = $iter($diff, []);
 
-    return implode(PHP_EOL, $lines) . PHP_EOL;
+    return implode(PHP_EOL, $lines);
 }
