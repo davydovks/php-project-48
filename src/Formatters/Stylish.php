@@ -24,8 +24,7 @@ function toStringStylish(mixed $value)
 function markLine(string $str, string $mark, string $indent)
 {
     $pos = strlen($indent) - 2;
-    $str[$pos] = $mark;
-    return $str;
+    return substr_replace($str, $mark, $pos, strlen($mark));
 }
 
 function getIndent(int $depth)
@@ -35,35 +34,33 @@ function getIndent(int $depth)
 
 function getArrayLines(array $array, int $depth)
 {
-    $acc = [];
-    foreach ($array as $key => $value) {
-        addLines($key, $value, $acc, $depth, ' ');
-    }
-    return $acc;
+    return array_reduce(
+        array_keys($array), 
+        fn($acc, $key) => addLines($key, $array[$key], $acc, $depth, ' '), 
+        []
+    );
 }
 
-function addLines(string $key, mixed $value, array &$acc, int $depth, string $mark)
+function addLines(string $key, mixed $value, array $acc, int $depth, string $mark)
 {
     $indent = getIndent($depth);
 
     if (is_array($value)) {
-        $acc[] = markLine("{$indent}{$key}: {", $mark, $indent);
-        $acc = array_merge($acc, getArrayLines($value, $depth + 1));
-        $acc[] = "{$indent}}";
+        $firstLine = markLine("{$indent}{$key}: {", $mark, $indent);
+        $lines = getArrayLines($value, $depth + 1);
+        $lastLine = "{$indent}}";
+        return [...$acc, $firstLine, ...$lines, $lastLine];
     } else {
         $strigifiedValue = toStringStylish($value);
-        $acc[] = markLine("{$indent}{$key}: {$strigifiedValue}", $mark, $indent);
+        $newLine = markLine("{$indent}{$key}: {$strigifiedValue}", $mark, $indent);
+        return [...$acc, $newLine];
     }
-
-    return $acc;
 }
 
-function addItem(array $item, array &$acc, int $depth, string $mark = ' ')
+function addItem(array $item, array $acc, int $depth, string $mark = ' ')
 {
     $value = $mark === '+' ? getValueAfter($item) : getValueBefore($item);
-    addLines(getKey($item), $value, $acc, $depth, $mark);
-
-    return $acc;
+    return addLines(getKey($item), $value, $acc, $depth, $mark);
 }
 
 function stylish(array $diff): string
@@ -86,9 +83,8 @@ function stylish(array $diff): string
             }
 
             if (isChanged($item)) {
-                addItem($item, $acc, $depth, '-');
-                addItem($item, $acc, $depth, '+');
-                return $acc;
+                $newAcc = addItem($item, $acc, $depth, '-');
+                return addItem($item, $newAcc, $depth, '+');
             }
 
             if (isAdded($item)) {
