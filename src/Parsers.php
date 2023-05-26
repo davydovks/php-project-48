@@ -8,8 +8,7 @@ function readFile(string $filename)
 {
     $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
     if ($ext == 'json') {
-        $fileContent = file_get_contents($filename);
-        return json_decode($fileContent, true);
+        return json_decode(strval(file_get_contents($filename)), true);
     } elseif ($ext == 'yml' || $ext == 'yaml') {
         return Yaml::parseFile($filename);
     } else {
