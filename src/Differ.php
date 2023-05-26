@@ -2,8 +2,9 @@
 
 namespace Differ\Differ;
 
-use function Differ\Formatters\genOutputFromDiff;
+use function Functional\sort;
 use function Differ\Parsers\readFile;
+use function Differ\Formatters\genOutputFromDiff;
 
 function getKeys(mixed $arr)
 {
@@ -13,8 +14,7 @@ function getKeys(mixed $arr)
 function mergeKeys(mixed $arr1, mixed $arr2)
 {
     $keys = array_unique(array_merge(getKeys($arr1), getKeys($arr2)));
-    sort($keys);
-    return $keys;
+    return sort($keys, fn($left, $right) => $left <=> $right);
 }
 
 function bothHaveArraysByKey(array $arr1, array $arr2, string $key)
