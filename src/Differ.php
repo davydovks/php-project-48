@@ -26,23 +26,26 @@ function bothHaveArraysByKey(array $arr1, array $arr2, string $key)
 
 function createDiff(array $arrayBefore, array $arrayAfter)
 {
-    $keys = mergeKeys($arrayBefore, $arrayAfter);
     return array_map(function ($key) use ($arrayBefore, $arrayAfter) {
         $result = ['key' => $key];
         if (bothHaveArraysByKey($arrayBefore, $arrayAfter, $key)) {
-            $result['children'] = createDiff($arrayBefore[$key], $arrayAfter[$key]);
-            return $result;
+            $children = createDiff($arrayBefore[$key], $arrayAfter[$key]);
+            //$result['children'] = createDiff($arrayBefore[$key], $arrayAfter[$key]);
+            return setChildren($result, $children);
         }
 
         if (array_key_exists($key, $arrayBefore)) {
-            $result['valueBefore'] = $arrayBefore[$key];
+            //$newItem = ['valueBefore' => $arrayBefore[$key]];
+            //$result['valueBefore'] = $arrayBefore[$key];
+            $result = setValueBefore($result, $arrayBefore[$key]);
         }
         if (array_key_exists($key, $arrayAfter)) {
-            $result['valueAfter'] = $arrayAfter[$key];
+            //$result['valueAfter'] = $arrayAfter[$key];
+            $result = setValueAfter($result, $arrayAfter[$key]);
         }
 
         return $result;
-    }, $keys);
+    }, mergeKeys($arrayBefore, $arrayAfter));
 }
 
 function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'stylish')
@@ -64,15 +67,43 @@ function getKey(array $item)
     return $item['key'];
 }
 
-function hasChildren(array $item)
-{
-    return array_key_exists('children', $item);
-}
-
 function getChildren(array $item)
 {
     return $item['children'];
 }
+
+function getValueBefore(array $item)
+{
+    return $item['valueBefore'];
+}
+
+function getValueAfter(array $item)
+{
+    return $item['valueAfter'];
+}
+
+function setChildren(array $item, array $children)
+{
+    $property = ['children' => $children];
+    return array_merge($item, $property);
+}
+
+function setValueBefore(array $item, mixed $value)
+{
+    $property = ['valueBefore' => $value];
+    return array_merge ($item, $property);
+}
+
+function setValueAfter(array $item, mixed $value)
+{
+    $property = ['valueAfter' => $value];
+    return array_merge ($item, $property);
+}
+
+function hasChildren(array $item)
+{
+    return array_key_exists('children', $item);
+}    
 
 function isTheSame(array $item)
 {
@@ -98,14 +129,4 @@ function isAdded(array $item)
 {
     return !array_key_exists('valueBefore', $item)
         && array_key_exists('valueAfter', $item);
-}
-
-function getValueBefore(array $item)
-{
-    return $item['valueBefore'];
-}
-
-function getValueAfter(array $item)
-{
-    return $item['valueAfter'];
 }
