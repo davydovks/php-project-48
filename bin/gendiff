@@ -3,7 +3,7 @@
 
 require_once __DIR__ . "/../vendor/autoload.php";
 
-use function Differ\ShowDoc\getDoc;
+use function Differ\Usage\getDoc;
 use function Differ\Differ\genDiff;
 
 $args = getDoc();

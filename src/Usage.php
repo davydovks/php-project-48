@@ -1,6 +1,6 @@
 <?php
 
-namespace Differ\ShowDoc;
+namespace Differ\Usage;
 
 use Docopt;
 
