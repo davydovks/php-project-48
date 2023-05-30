@@ -21,9 +21,6 @@ jobs:
         php-version: '8.2'
         coverage: xdebug
 
-    - name: Install
-      run: make install
-
     - name: Run Linter
       run: make lint
 
