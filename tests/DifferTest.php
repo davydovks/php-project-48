@@ -14,62 +14,36 @@ class DifferTest extends TestCase
         return realpath(implode('/', $parts));
     }
 
-    public function testStylishFromJson(): void
+    public static function outputDataProvider()
     {
-        $JSONFile1 = $this->getFixtureFullPath('file1.json');
-        $JSONFile2 = $this->getFixtureFullPath('file2.json');
-        $expected = $this->getFixtureFullPath('expectedStylish.txt');
-        $actual = genDiff($JSONFile1, $JSONFile2, 'stylish');
-
-        $this->assertStringEqualsFile($expected, $actual);
+        return [
+            ['file1.json', 'file2.json', 'expectedStylish.txt', 'stylish'],
+            ['file1.yml', 'file2.yml', 'expectedStylish.txt', 'stylish'],
+            ['file1.yml', 'file2.json', 'expectedStylish.txt', 'stylish'],
+            ['file1.json', 'file2.json', 'expectedPlain.txt', 'plain'],
+            ['file1.yml', 'file2.yml', 'expectedJson.json', 'json']
+        ];
     }
 
-    public function testStylishFromYaml(): void
+    /**
+     * @dataProvider outputDataProvider
+     */
+    public function testOutput($file1, $file2, $expectedFile, $format): void
     {
-        $file1 = $this->getFixtureFullPath('file1.yml');
-        $file2 = $this->getFixtureFullPath('file2.yml');
-        $expected = $this->getFixtureFullPath('expectedStylish.txt');
-        $actual = genDiff($file1, $file2, 'stylish');
-
-        $this->assertStringEqualsFile($expected, $actual);
-    }
-
-    public function testStylishFromMixed(): void
-    {
-        $file1 = $this->getFixtureFullPath('file1.yml');
-        $file2 = $this->getFixtureFullPath('file2.json');
-        $expected = $this->getFixtureFullPath('expectedStylish.txt');
-        $actual = genDiff($file1, $file2, 'stylish');
+        $fixture1 = $this->getFixtureFullPath($file1);
+        $fixture2 = $this->getFixtureFullPath($file2);
+        $expected = $this->getFixtureFullPath($expectedFile);
+        $actual = genDiff($fixture1, $fixture2, $format);
 
         $this->assertStringEqualsFile($expected, $actual);
     }
 
     public function testStylishAsDefault(): void
     {
-        $file1 = $this->getFixtureFullPath('file1.yml');
-        $file2 = $this->getFixtureFullPath('file2.yml');
+        $fixture1 = $this->getFixtureFullPath('file1.yml');
+        $fixture2 = $this->getFixtureFullPath('file2.yml');
         $expected = $this->getFixtureFullPath('expectedStylish.txt');
-        $actual = genDiff($file1, $file2);
-
-        $this->assertStringEqualsFile($expected, $actual);
-    }
-
-    public function testPlainFromMixed(): void
-    {
-        $file1 = $this->getFixtureFullPath('file1.yml');
-        $file2 = $this->getFixtureFullPath('file2.json');
-        $expected = $this->getFixtureFullPath('expectedPlain.txt');
-        $actual = genDiff($file1, $file2, 'plain');
-
-        $this->assertStringEqualsFile($expected, $actual);
-    }
-
-    public function testJSONFromMixed(): void
-    {
-        $file1 = $this->getFixtureFullPath('file1.yml');
-        $file2 = $this->getFixtureFullPath('file2.json');
-        $expected = $this->getFixtureFullPath('expectedJson.json');
-        $actual = genDiff($file1, $file2, 'json');
+        $actual = genDiff($fixture1, $fixture2);
 
         $this->assertStringEqualsFile($expected, $actual);
     }
