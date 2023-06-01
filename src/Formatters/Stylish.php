@@ -71,7 +71,7 @@ function addStructure(array $innerLines, string $key, int $depth, string $mark =
     return [$firstLine, ...$innerLines, $lastLine];
 }
 
-function stylish(array $diff): string
+function formatDiff(array $diff): string
 {
     $iter = function (array $coll, int $depth) use (&$iter) {
         return array_reduce($coll, function ($acc, $item) use ($depth, &$iter) {

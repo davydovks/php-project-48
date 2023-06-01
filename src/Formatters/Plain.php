@@ -50,7 +50,7 @@ function getLineRemoved(array $stack)
     return "Property '{$property}' was removed";
 }
 
-function plain(array $diff)
+function formatDiff(array $diff): string
 {
     $iter = function ($coll, array $parentElem) use (&$iter) {
         return array_reduce($coll, function (array $acc, $item) use (&$iter, $parentElem) {
