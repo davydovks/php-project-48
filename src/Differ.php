@@ -3,7 +3,7 @@
 namespace Differ\Differ;
 
 use function Functional\sort;
-use function Differ\Parsers\readFile;
+use function Differ\Parsers\parseFile;
 use function Differ\Formatters\genOutputFromDiff;
 
 function getKeys(mixed $arr)
@@ -44,12 +44,17 @@ function createDiff(array $arrayBefore, array $arrayAfter)
 
 function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'stylish')
 {
-    $arrayBefore = readFile($pathToFile1);
-    $arrayAfter = readFile($pathToFile2);
+    $arrayBefore = parseFile($pathToFile1, getExt($pathToFile1));
+    $arrayAfter = parseFile($pathToFile2, getExt($pathToFile2));
 
     $diff = createDiff($arrayBefore, $arrayAfter);
 
     return genOutputFromDiff($diff, $format);
+}
+
+function getExt(string $filename): string
+{
+    return strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 }
 
 /**
