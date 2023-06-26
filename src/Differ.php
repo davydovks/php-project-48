@@ -34,9 +34,11 @@ function createDiff(array $arrayBefore, array $arrayAfter)
     }, mergeKeys($arrayBefore, $arrayAfter));
 }
 
-function getKeys(mixed $arr)
+function bothHaveArraysByKey(array $arr1, array $arr2, string $key)
 {
-    return is_object($arr) ? get_object_vars($arr) : array_keys($arr);
+    $firstIsArray = isset($arr1[$key]) && is_array($arr1[$key]);
+    $secondIsArray = isset($arr2[$key]) && is_array($arr2[$key]);
+    return $firstIsArray && $secondIsArray;
 }
 
 function mergeKeys(mixed $arr1, mixed $arr2)
@@ -45,11 +47,9 @@ function mergeKeys(mixed $arr1, mixed $arr2)
     return sort($keys, fn($left, $right) => $left <=> $right);
 }
 
-function bothHaveArraysByKey(array $arr1, array $arr2, string $key)
+function getKeys(mixed $arr)
 {
-    $firstIsArray = isset($arr1[$key]) && is_array($arr1[$key]);
-    $secondIsArray = isset($arr2[$key]) && is_array($arr2[$key]);
-    return $firstIsArray && $secondIsArray;
+    return is_object($arr) ? get_object_vars($arr) : array_keys($arr);
 }
 
 /**
