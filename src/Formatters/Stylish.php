@@ -12,65 +12,6 @@ use function Differ\Differ\isAdded;
 use function Differ\Differ\getValueBefore;
 use function Differ\Differ\getValueAfter;
 
-function toString(mixed $value)
-{
-    if (is_string($value)) {
-        return trim(var_export($value, true), "'");
-    }
-
-    return json_encode($value);
-}
-
-function markLine(string $str, string $mark, string $indent)
-{
-    $pos = strlen($indent) - 2;
-    return substr_replace($str, $mark, $pos, strlen($mark));
-}
-
-function getIndent(int $depth)
-{
-    return str_repeat('    ', $depth);
-}
-
-function getArrayLines(array $array, int $depth)
-{
-    return array_reduce(
-        array_keys($array),
-        fn($acc, $key) => addLines($key, $array[$key], $acc, $depth, ' '),
-        []
-    );
-}
-
-function addLines(string $key, mixed $value, array $acc, int $depth, string $mark)
-{
-    if (is_array($value)) {
-        $innerLines = getArrayLines($value, $depth + 1);
-        $addedLines = addStructure($innerLines, $key, $depth, $mark);
-        return [...$acc, ...$addedLines];
-    } else {
-        $indent = getIndent($depth);
-        $strigifiedValue = toString($value);
-        $newLine = markLine("{$indent}{$key}: {$strigifiedValue}", $mark, $indent);
-        return [...$acc, $newLine];
-    }
-}
-
-function addItem(array $item, array $acc, int $depth, string $mark = ' ')
-{
-    $value = $mark === '+' ? getValueAfter($item) : getValueBefore($item);
-    return addLines(getKey($item), $value, $acc, $depth, $mark);
-}
-
-function addStructure(array $innerLines, string $key, int $depth, string $mark = ' ')
-{
-    $indent = getIndent($depth);
-
-    $firstLine = markLine("{$indent}{$key}: {", $mark, $indent);
-    $lastLine = "{$indent}}";
-
-    return [$firstLine, ...$innerLines, $lastLine];
-}
-
 function formatDiff(array $diff): string
 {
     $iter = function (array $coll, int $depth) use (&$iter) {
@@ -107,4 +48,63 @@ function formatDiff(array $diff): string
     $lines = $iter($diff, 1);
 
     return implode(PHP_EOL, ['{', ...$lines, '}']);
+}
+
+function addStructure(array $innerLines, string $key, int $depth, string $mark = ' ')
+{
+    $indent = getIndent($depth);
+
+    $firstLine = markLine("{$indent}{$key}: {", $mark, $indent);
+    $lastLine = "{$indent}}";
+
+    return [$firstLine, ...$innerLines, $lastLine];
+}
+
+function getIndent(int $depth)
+{
+    return str_repeat('    ', $depth);
+}
+
+function markLine(string $str, string $mark, string $indent)
+{
+    $pos = strlen($indent) - 2;
+    return substr_replace($str, $mark, $pos, strlen($mark));
+}
+
+function addItem(array $item, array $acc, int $depth, string $mark = ' ')
+{
+    $value = $mark === '+' ? getValueAfter($item) : getValueBefore($item);
+    return addLines(getKey($item), $value, $acc, $depth, $mark);
+}
+
+function addLines(string $key, mixed $value, array $acc, int $depth, string $mark)
+{
+    if (is_array($value)) {
+        $innerLines = getArrayLines($value, $depth + 1);
+        $addedLines = addStructure($innerLines, $key, $depth, $mark);
+        return [...$acc, ...$addedLines];
+    } else {
+        $indent = getIndent($depth);
+        $strigifiedValue = toString($value);
+        $newLine = markLine("{$indent}{$key}: {$strigifiedValue}", $mark, $indent);
+        return [...$acc, $newLine];
+    }
+}
+
+function getArrayLines(array $array, int $depth)
+{
+    return array_reduce(
+        array_keys($array),
+        fn($acc, $key) => addLines($key, $array[$key], $acc, $depth, ' '),
+        []
+    );
+}
+
+function toString(mixed $value)
+{
+    if (is_string($value)) {
+        return trim(var_export($value, true), "'");
+    }
+
+    return json_encode($value);
 }
