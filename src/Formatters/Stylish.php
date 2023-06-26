@@ -24,24 +24,17 @@ function formatDiff(array $diff): string
                 return array_merge($acc, $addedLines);
             }
 
-            if (isUnchanged($item)) {
-                return addItem($item, $acc, $depth);
-            }
-
             if (isChanged($item)) {
                 $newAcc = addItem($item, $acc, $depth, '-');
                 return addItem($item, $newAcc, $depth, '+');
             }
 
-            if (isAdded($item)) {
-                return addItem($item, $acc, $depth, '+');
-            }
-
-            if (isDeleted($item)) {
-                return addItem($item, $acc, $depth, '-');
-            }
-
-            throw new \LogicException('Error in element with key: ' . $key);
+            return match (true) {
+                isUnchanged($item) => addItem($item, $acc, $depth),
+                isAdded($item) => addItem($item, $acc, $depth, '+'),
+                isDeleted($item) => addItem($item, $acc, $depth, '-'),
+                default => throw new \LogicException('Error in element with key: ' . $key)
+            };
         }, []);
     };
 

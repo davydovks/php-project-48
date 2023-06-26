@@ -18,26 +18,13 @@ function formatDiff(array $diff): string
             $key = getKey($item);
             $currentElem = [...$parentElem, $key];
 
-            if (hasChildren($item)) {
-                return array_merge($acc, $iter(getChildren($item), $currentElem));
-            }
-
-            if (isChanged($item)) {
-                $line = getLineChanged($item, $currentElem);
-                return array_merge($acc, [$line]);
-            }
-
-            if (isAdded($item)) {
-                $line = getLineAdded($item, $currentElem);
-                return array_merge($acc, [$line]);
-            }
-
-            if (isDeleted($item)) {
-                $line = getLineRemoved($currentElem);
-                return array_merge($acc, [$line]);
-            }
-
-            return $acc;
+            return match (true) {
+                hasChildren($item) => array_merge($acc, $iter(getChildren($item), $currentElem)),
+                isChanged($item) => [...$acc, getLineChanged($item, $currentElem)],
+                isAdded($item) => [...$acc, getLineAdded($item, $currentElem)],
+                isDeleted($item) => [...$acc, getLineRemoved($currentElem)],
+                default => $acc
+            };
         }, []);
     };
 
