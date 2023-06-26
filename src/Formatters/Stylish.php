@@ -5,7 +5,7 @@ namespace Differ\Formatters\Stylish;
 use function Differ\Differ\getKey;
 use function Differ\Differ\hasChildren;
 use function Differ\Differ\getChildren;
-use function Differ\Differ\isTheSame;
+use function Differ\Differ\isUnchanged;
 use function Differ\Differ\isChanged;
 use function Differ\Differ\isDeleted;
 use function Differ\Differ\isAdded;
@@ -24,7 +24,7 @@ function formatDiff(array $diff): string
                 return array_merge($acc, $addedLines);
             }
 
-            if (isTheSame($item)) {
+            if (isUnchanged($item)) {
                 return addItem($item, $acc, $depth);
             }
 

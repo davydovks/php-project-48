@@ -101,7 +101,7 @@ function hasChildren(array $item)
     return array_key_exists('children', $item);
 }
 
-function isTheSame(array $item)
+function isUnchanged(array $item)
 {
     return array_key_exists('valueBefore', $item)
         && array_key_exists('valueAfter', $item)
