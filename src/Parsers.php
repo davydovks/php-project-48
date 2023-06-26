@@ -2,13 +2,16 @@
 
 namespace Differ\Parsers;
 
-use Symfony\Component\Yaml\Yaml;
+use function Differ\Files\getExtension;
+use function Differ\Files\readJsonFile;
+use function Differ\Files\readYamlFile;
 
-function parseFile(string $filename, string $extension)
+function parseFile(string $filename)
 {
+    $extension = getExtension($filename);
     return match ($extension) {
-        'json' => json_decode(strval(file_get_contents($filename)), true),
-        'yml', 'yaml' => Yaml::parseFile($filename),
+        'json' => readJsonFile($filename),
+        'yml', 'yaml' => readYamlFile($filename),
         default => throw new \Exception("Unknown file format: {$extension}")
     };
 }

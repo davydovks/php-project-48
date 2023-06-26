@@ -8,6 +8,7 @@
             "src/Cli.php",
             "src/Differ.php",
             "src/Parsers.php",
+            "src/Files.php",
             "src/Formatters.php",
             "src/Formatters/Stylish.php",
             "src/Formatters/Plain.php",

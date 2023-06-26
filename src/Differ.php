@@ -2,26 +2,18 @@
 
 namespace Differ\Differ;
 
-use function Functional\sort;
 use function Differ\Parsers\parseFile;
 use function Differ\Formatters\genOutputFromDiff;
+use function Functional\sort;
 
-function getKeys(mixed $arr)
+function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'stylish')
 {
-    return is_object($arr) ? get_object_vars($arr) : array_keys($arr);
-}
+    $arrayBefore = parseFile($pathToFile1);
+    $arrayAfter = parseFile($pathToFile2);
 
-function mergeKeys(mixed $arr1, mixed $arr2)
-{
-    $keys = array_unique(array_merge(getKeys($arr1), getKeys($arr2)));
-    return sort($keys, fn($left, $right) => $left <=> $right);
-}
+    $diff = createDiff($arrayBefore, $arrayAfter);
 
-function bothHaveArraysByKey(array $arr1, array $arr2, string $key)
-{
-    $firstIsArray = isset($arr1[$key]) && is_array($arr1[$key]);
-    $secondIsArray = isset($arr2[$key]) && is_array($arr2[$key]);
-    return $firstIsArray && $secondIsArray;
+    return genOutputFromDiff($diff, $format);
 }
 
 function createDiff(array $arrayBefore, array $arrayAfter)
@@ -42,19 +34,22 @@ function createDiff(array $arrayBefore, array $arrayAfter)
     }, mergeKeys($arrayBefore, $arrayAfter));
 }
 
-function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'stylish')
+function getKeys(mixed $arr)
 {
-    $arrayBefore = parseFile($pathToFile1, getExt($pathToFile1));
-    $arrayAfter = parseFile($pathToFile2, getExt($pathToFile2));
-
-    $diff = createDiff($arrayBefore, $arrayAfter);
-
-    return genOutputFromDiff($diff, $format);
+    return is_object($arr) ? get_object_vars($arr) : array_keys($arr);
 }
 
-function getExt(string $filename): string
+function mergeKeys(mixed $arr1, mixed $arr2)
 {
-    return strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    $keys = array_unique(array_merge(getKeys($arr1), getKeys($arr2)));
+    return sort($keys, fn($left, $right) => $left <=> $right);
+}
+
+function bothHaveArraysByKey(array $arr1, array $arr2, string $key)
+{
+    $firstIsArray = isset($arr1[$key]) && is_array($arr1[$key]);
+    $secondIsArray = isset($arr2[$key]) && is_array($arr2[$key]);
+    return $firstIsArray && $secondIsArray;
 }
 
 /**
