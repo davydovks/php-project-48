@@ -10,9 +10,9 @@ use function Differ\Differ\getValueAfter;
 
 function formatDiff(array $diff): string
 {
-    $iter = function ($diff, array $propertyStack) use (&$iter) {
-        return array_reduce($diff, function (array $acc, $item) use (&$iter, $propertyStack) {
-            array_push($propertyStack, getNodeKey($item));
+    $iter = function ($diff, array $parentPropertyStack) use (&$iter) {
+        return array_reduce($diff, function (array $acc, $item) use (&$iter, $parentPropertyStack) {
+            $propertyStack = [...$parentPropertyStack, getNodeKey($item)];
             return match (getNodeType($item)) {
                 'parent' => array_merge($acc, $iter(getChildren($item), $propertyStack)),
                 'changed' => [...$acc, genLineForChanged($item, $propertyStack)],
