@@ -2,7 +2,7 @@
 
 namespace Differ\Formatters\Plain;
 
-use function Differ\Differ\getKey;
+use function Differ\Differ\getNodeKey;
 use function Differ\Differ\hasChildren;
 use function Differ\Differ\getChildren;
 use function Differ\Differ\isChanged;
@@ -15,7 +15,7 @@ function formatDiff(array $diff): string
 {
     $iter = function ($coll, array $parentElem) use (&$iter) {
         return array_reduce($coll, function (array $acc, $item) use (&$iter, $parentElem) {
-            $key = getKey($item);
+            $key = getNodeKey($item);
             $currentElem = [...$parentElem, $key];
 
             return match (true) {

@@ -4,31 +4,37 @@
         "children": [
             {
                 "key": "follow",
-                "valueAfter": false
+                "valueAfter": false,
+                "nodeType": "added"
             },
             {
                 "key": "setting1",
                 "valueBefore": "Value 1",
-                "valueAfter": "Value 1"
+                "valueAfter": "Value 1",
+                "nodeType": "unchanged"
             },
             {
                 "key": "setting2",
-                "valueBefore": 200
+                "valueBefore": 200,
+                "nodeType": "deleted"
             },
             {
                 "key": "setting3",
                 "valueBefore": true,
-                "valueAfter": null
+                "valueAfter": null,
+                "nodeType": "changed"
             },
             {
                 "key": "setting4",
-                "valueAfter": "blah blah"
+                "valueAfter": "blah blah",
+                "nodeType": "added"
             },
             {
                 "key": "setting5",
                 "valueAfter": {
                     "key5": "value5"
-                }
+                },
+                "nodeType": "added"
             },
             {
                 "key": "setting6",
@@ -39,22 +45,28 @@
                             {
                                 "key": "wow",
                                 "valueBefore": "",
-                                "valueAfter": "so much"
+                                "valueAfter": "so much",
+                                "nodeType": "changed"
                             }
-                        ]
+                        ],
+                        "nodeType": "parent"
                     },
                     {
                         "key": "key",
                         "valueBefore": "value",
-                        "valueAfter": "value"
+                        "valueAfter": "value",
+                        "nodeType": "unchanged"
                     },
                     {
                         "key": "ops",
-                        "valueAfter": "vops"
+                        "valueAfter": "vops",
+                        "nodeType": "added"
                     }
-                ]
+                ],
+                "nodeType": "parent"
             }
-        ]
+        ],
+        "nodeType": "parent"
     },
     {
         "key": "group1",
@@ -62,21 +74,25 @@
             {
                 "key": "baz",
                 "valueBefore": "bas",
-                "valueAfter": "bars"
+                "valueAfter": "bars",
+                "nodeType": "changed"
             },
             {
                 "key": "foo",
                 "valueBefore": "bar",
-                "valueAfter": "bar"
+                "valueAfter": "bar",
+                "nodeType": "unchanged"
             },
             {
                 "key": "nest",
                 "valueBefore": {
                     "key": "value"
                 },
-                "valueAfter": "str"
+                "valueAfter": "str",
+                "nodeType": "changed"
             }
-        ]
+        ],
+        "nodeType": "parent"
     },
     {
         "key": "group2",
@@ -85,7 +101,8 @@
             "deep": {
                 "id": 45
             }
-        }
+        },
+        "nodeType": "deleted"
     },
     {
         "key": "group3",
@@ -96,6 +113,7 @@
                 }
             },
             "fee": 100500
-        }
+        },
+        "nodeType": "added"
     }
 ]

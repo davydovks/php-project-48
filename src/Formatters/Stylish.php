@@ -2,7 +2,7 @@
 
 namespace Differ\Formatters\Stylish;
 
-use function Differ\Differ\getKey;
+use function Differ\Differ\getNodeKey;
 use function Differ\Differ\hasChildren;
 use function Differ\Differ\getChildren;
 use function Differ\Differ\isUnchanged;
@@ -16,7 +16,7 @@ function formatDiff(array $diff): string
 {
     $iter = function (array $coll, int $depth) use (&$iter) {
         return array_reduce($coll, function ($acc, $item) use ($depth, &$iter) {
-            $key = getKey($item);
+            $key = getNodeKey($item);
 
             if (hasChildren($item)) {
                 $innerLines = $iter(getChildren($item), $depth + 1);
@@ -67,7 +67,7 @@ function markLine(string $str, string $mark, string $indent)
 function addItem(array $item, array $acc, int $depth, string $mark = ' ')
 {
     $value = $mark === '+' ? getValueAfter($item) : getValueBefore($item);
-    return addLines(getKey($item), $value, $acc, $depth, $mark);
+    return addLines(getNodeKey($item), $value, $acc, $depth, $mark);
 }
 
 function addLines(string $key, mixed $value, array $acc, int $depth, string $mark)

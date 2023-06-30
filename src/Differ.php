@@ -6,6 +6,7 @@ use function Differ\Files\readFile;
 use function Differ\Files\getExtension;
 use function Differ\Parsers\parse;
 use function Differ\Formatters\genOutputFromDiff;
+use function Functional\retry;
 use function Functional\sort;
 
 function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'stylish')
@@ -27,26 +28,43 @@ function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'sty
 function createDiff(array $arrayBefore, array $arrayAfter)
 {
     return array_map(function ($key) use ($arrayBefore, $arrayAfter) {
-        $keyProperty = setKey($key);
+        $nodeKey = setNodeKey($key);
 
-        if (bothHaveArraysByKey($arrayBefore, $arrayAfter, $key)) {
+        if (
+            isset($arrayBefore[$key])
+            && is_array($arrayBefore[$key])
+            && isset($arrayAfter[$key])
+            && is_array($arrayAfter[$key])
+        ) {
             $children = setChildren(createDiff($arrayBefore[$key], $arrayAfter[$key]));
-            return array_merge($keyProperty, $children);
+            $nodeType = setNodeType('parent');
+            $node = array_merge($nodeKey, $children, $nodeType);
+            return $node;
         }
 
         $valueBefore = array_key_exists($key, $arrayBefore) ?
             setValueBefore($arrayBefore[$key]) : [];
         $valueAfter = array_key_exists($key, $arrayAfter) ?
             setValueAfter($arrayAfter[$key]) : [];
-        return array_merge($keyProperty, $valueBefore, $valueAfter);
-    }, mergeKeys($arrayBefore, $arrayAfter));
-}
 
-function bothHaveArraysByKey(array $arr1, array $arr2, string $key)
-{
-    $firstIsArray = isset($arr1[$key]) && is_array($arr1[$key]);
-    $secondIsArray = isset($arr2[$key]) && is_array($arr2[$key]);
-    return $firstIsArray && $secondIsArray;
+        $nodeType = setNodeType(match (true) {
+            $valueBefore !== []
+            && $valueAfter !== []
+            && $arrayBefore[$key] === $arrayAfter[$key] => 'unchanged',
+            $valueBefore !== []
+            && $valueAfter !== []
+            && $arrayBefore[$key] !== $arrayAfter[$key] => 'changed',
+            $valueBefore !== []
+            && $valueAfter === [] => 'deleted',
+            $valueBefore === []
+            && $valueAfter !== [] => 'added',
+            default => throw new \LogicException("Unable to define node type")
+        });
+
+        $node = array_merge($nodeKey, $valueBefore, $valueAfter, $nodeType);
+
+        return $node;
+    }, mergeKeys($arrayBefore, $arrayAfter));
 }
 
 function mergeKeys(mixed $arr1, mixed $arr2)
@@ -64,7 +82,7 @@ function getKeys(mixed $arr)
  * Interface functions
  */
 
-function getKey(array $item)
+function getNodeKey(array $item)
 {
     return $item['key'];
 }
@@ -84,7 +102,12 @@ function getValueAfter(array $item)
     return $item['valueAfter'];
 }
 
-function setKey(string $key)
+function getNodeType(array $item)
+{
+    return $item['nodeType'];
+}
+
+function setNodeKey(string $key)
 {
     return ['key' => $key];
 }
@@ -102,6 +125,11 @@ function setValueBefore(mixed $value)
 function setValueAfter(mixed $value)
 {
     return ['valueAfter' => $value];
+}
+
+function setNodeType(string $type): array
+{
+    return ['nodeType' => $type];
 }
 
 function hasChildren(array $item)
