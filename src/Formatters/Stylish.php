@@ -73,8 +73,8 @@ function generateLines(string $key, mixed $value, array $acc, int $depth, string
             fn($acc, $key) => generateLines($key, $value[$key], $acc, $depth + 1),
             []
         );
-        $addedLines = genOutputForStructure($innerLines, $key, $depth, $mark);
-        return [...$acc, ...$addedLines];
+        $allLines = genOutputForStructure($innerLines, $key, $depth, $mark);
+        return array_merge($acc, $allLines);
     } else {
         $indent = getIndent($depth);
         $strigifiedValue = toString($value);
