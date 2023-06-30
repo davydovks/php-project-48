@@ -3,12 +3,8 @@
 namespace Differ\Formatters\Stylish;
 
 use function Differ\Differ\getNodeKey;
-use function Differ\Differ\hasChildren;
 use function Differ\Differ\getChildren;
-use function Differ\Differ\isUnchanged;
-use function Differ\Differ\isChanged;
-use function Differ\Differ\isDeleted;
-use function Differ\Differ\isAdded;
+use function Differ\Differ\getNodeType;
 use function Differ\Differ\getValueBefore;
 use function Differ\Differ\getValueAfter;
 
@@ -17,24 +13,23 @@ function formatDiff(array $diff): string
     $iter = function (array $coll, int $depth) use (&$iter) {
         return array_reduce($coll, function ($acc, $item) use ($depth, &$iter) {
             $key = getNodeKey($item);
-
-            if (hasChildren($item)) {
-                $innerLines = $iter(getChildren($item), $depth + 1);
-                $addedLines = addStructure($innerLines, $key, $depth);
-                return array_merge($acc, $addedLines);
+            switch (getNodeType($item)) {
+                case 'parent':
+                    $innerLines = $iter(getChildren($item), $depth + 1);
+                    $allLines = genOutputForStructure($innerLines, $key, $depth);
+                    return array_merge($acc, $allLines);
+                case 'changed':
+                    $newAcc = genOutputForLeaf($item, $acc, $depth, '-');
+                    return genOutputForLeaf($item, $newAcc, $depth, '+');
+                case 'unchanged':
+                    return genOutputForLeaf($item, $acc, $depth);
+                case 'added':
+                    return genOutputForLeaf($item, $acc, $depth, '+');
+                case 'deleted':
+                    return genOutputForLeaf($item, $acc, $depth, '-');
+                default:
+                    throw new \LogicException('Error in element with key: ' . $key);
             }
-
-            if (isChanged($item)) {
-                $newAcc = addItem($item, $acc, $depth, '-');
-                return addItem($item, $newAcc, $depth, '+');
-            }
-
-            return match (true) {
-                isUnchanged($item) => addItem($item, $acc, $depth),
-                isAdded($item) => addItem($item, $acc, $depth, '+'),
-                isDeleted($item) => addItem($item, $acc, $depth, '-'),
-                default => throw new \LogicException('Error in element with key: ' . $key)
-            };
         }, []);
     };
 
@@ -43,7 +38,7 @@ function formatDiff(array $diff): string
     return implode(PHP_EOL, ['{', ...$lines, '}']);
 }
 
-function addStructure(array $innerLines, string $key, int $depth, string $mark = ' ')
+function genOutputForStructure(array $innerLines, string $key, int $depth, string $mark = ' ')
 {
     $indent = getIndent($depth);
 
@@ -64,17 +59,21 @@ function markLine(string $str, string $mark, string $indent)
     return substr_replace($str, $mark, $pos, strlen($mark));
 }
 
-function addItem(array $item, array $acc, int $depth, string $mark = ' ')
+function genOutputForLeaf(array $item, array $acc, int $depth, string $mark = ' ')
 {
     $value = $mark === '+' ? getValueAfter($item) : getValueBefore($item);
-    return addLines(getNodeKey($item), $value, $acc, $depth, $mark);
+    return generateLines(getNodeKey($item), $value, $acc, $depth, $mark);
 }
 
-function addLines(string $key, mixed $value, array $acc, int $depth, string $mark)
+function generateLines(string $key, mixed $value, array $acc, int $depth, string $mark = ' ')
 {
     if (is_array($value)) {
-        $innerLines = getArrayLines($value, $depth + 1);
-        $addedLines = addStructure($innerLines, $key, $depth, $mark);
+        $innerLines = array_reduce(
+            array_keys($value),
+            fn($acc, $key) => generateLines($key, $value[$key], $acc, $depth + 1),
+            []
+        );
+        $addedLines = genOutputForStructure($innerLines, $key, $depth, $mark);
         return [...$acc, ...$addedLines];
     } else {
         $indent = getIndent($depth);
@@ -82,15 +81,6 @@ function addLines(string $key, mixed $value, array $acc, int $depth, string $mar
         $newLine = markLine("{$indent}{$key}: {$strigifiedValue}", $mark, $indent);
         return [...$acc, $newLine];
     }
-}
-
-function getArrayLines(array $array, int $depth)
-{
-    return array_reduce(
-        array_keys($array),
-        fn($acc, $key) => addLines($key, $array[$key], $acc, $depth, ' '),
-        []
-    );
 }
 
 function toString(mixed $value)

@@ -130,34 +130,3 @@ function setNodeType(string $type): array
 {
     return ['nodeType' => $type];
 }
-
-function hasChildren(array $item)
-{
-    return array_key_exists('children', $item);
-}
-
-function isUnchanged(array $item)
-{
-    return array_key_exists('valueBefore', $item)
-        && array_key_exists('valueAfter', $item)
-        && $item['valueBefore'] === $item['valueAfter'];
-}
-
-function isChanged(array $item)
-{
-    return array_key_exists('valueBefore', $item)
-        && array_key_exists('valueAfter', $item)
-        && $item['valueBefore'] !== $item['valueAfter'];
-}
-
-function isDeleted(array $item)
-{
-    return array_key_exists('valueBefore', $item)
-        && !array_key_exists('valueAfter', $item);
-}
-
-function isAdded(array $item)
-{
-    return !array_key_exists('valueBefore', $item)
-        && array_key_exists('valueAfter', $item);
-}
