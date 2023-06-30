@@ -13,13 +13,15 @@ function formatDiff(array $diff): string
     $iter = function ($diff, array $parentPropertyStack) use (&$iter) {
         return array_reduce($diff, function (array $acc, $item) use (&$iter, $parentPropertyStack) {
             $propertyStack = [...$parentPropertyStack, getNodeKey($item)];
-            return match (getNodeType($item)) {
-                'parent' => array_merge($acc, $iter(getChildren($item), $propertyStack)),
-                'changed' => [...$acc, genLineForChanged($item, $propertyStack)],
-                'added' => [...$acc, genLineForAdded($item, $propertyStack)],
-                'deleted' => [...$acc, genLineForRemoved($propertyStack)],
-                default => $acc
+            $addedLines = match (getNodeType($item)) {
+                'parent' => $iter(getChildren($item), $propertyStack),
+                'changed' => genLineForChanged($item, $propertyStack),
+                'added' => genLineForAdded($item, $propertyStack),
+                'deleted' => genLineForRemoved($propertyStack),
+                default => []
             };
+
+            return array_merge($acc, $addedLines);
         }, []);
     };
 
@@ -33,7 +35,7 @@ function genLineForChanged(array $item, array $stack)
     $property = getProperty($stack);
     $old = toString(getValueBefore($item));
     $new = toString(getValueAfter($item));
-    return "Property '{$property}' was updated. From {$old} to {$new}";
+    return ["Property '{$property}' was updated. From {$old} to {$new}"];
 }
 
 function getProperty(array $stack)
@@ -56,11 +58,11 @@ function genLineForAdded(array $item, array $stack)
 {
     $property = getProperty($stack);
     $value = toString(getValueAfter($item));
-    return "Property '{$property}' was added with value: {$value}";
+    return ["Property '{$property}' was added with value: {$value}"];
 }
 
 function genLineForRemoved(array $stack)
 {
     $property = getProperty($stack);
-    return "Property '{$property}' was removed";
+    return ["Property '{$property}' was removed"];
 }
