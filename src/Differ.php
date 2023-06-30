@@ -62,20 +62,19 @@ function createDiff(array $arrayBefore, array $arrayAfter)
         });
 
         $node = array_merge($nodeKey, $valueBefore, $valueAfter, $nodeType);
-
         return $node;
     }, mergeKeys($arrayBefore, $arrayAfter));
 }
 
 function mergeKeys(mixed $arr1, mixed $arr2)
 {
-    $keys = array_unique(array_merge(getKeys($arr1), getKeys($arr2)));
+    $keys = array_unique(array_merge(readKeys($arr1), readKeys($arr2)));
     return sort($keys, fn($left, $right) => $left <=> $right);
 }
 
-function getKeys(mixed $arr)
+function readKeys(mixed $coll)
 {
-    return is_object($arr) ? get_object_vars($arr) : array_keys($arr);
+    return is_object($coll) ? get_object_vars($coll) : array_keys($coll);
 }
 
 /**
