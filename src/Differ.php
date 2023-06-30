@@ -31,10 +31,8 @@ function createDiff(array $arrayBefore, array $arrayAfter)
         $nodeKey = setNodeKey($key);
 
         if (
-            isset($arrayBefore[$key])
-            && is_array($arrayBefore[$key])
-            && isset($arrayAfter[$key])
-            && is_array($arrayAfter[$key])
+            isset($arrayBefore[$key]) && is_array($arrayBefore[$key])
+            && isset($arrayAfter[$key]) && is_array($arrayAfter[$key])
         ) {
             $children = setChildren(createDiff($arrayBefore[$key], $arrayAfter[$key]));
             $nodeType = setNodeType('parent');
@@ -48,16 +46,12 @@ function createDiff(array $arrayBefore, array $arrayAfter)
             setValueAfter($arrayAfter[$key]) : [];
 
         $nodeType = setNodeType(match (true) {
-            $valueBefore !== []
-            && $valueAfter !== []
-            && $arrayBefore[$key] === $arrayAfter[$key] => 'unchanged',
-            $valueBefore !== []
-            && $valueAfter !== []
+            $valueBefore !== [] && $valueAfter === [] => 'deleted',
+            $valueBefore === [] && $valueAfter !== [] => 'added',
+            $valueBefore !== [] && $valueAfter !== []
             && $arrayBefore[$key] !== $arrayAfter[$key] => 'changed',
-            $valueBefore !== []
-            && $valueAfter === [] => 'deleted',
-            $valueBefore === []
-            && $valueAfter !== [] => 'added',
+            $valueBefore !== [] && $valueAfter !== []
+            && $arrayBefore[$key] === $arrayAfter[$key] => 'unchanged',
             default => throw new \LogicException("Unable to define node type")
         });
 
