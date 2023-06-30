@@ -2,14 +2,22 @@
 
 namespace Differ\Differ;
 
-use function Differ\Parsers\parseFile;
+use function Differ\Files\readFile;
+use function Differ\Files\getExtension;
+use function Differ\Parsers\parse;
 use function Differ\Formatters\genOutputFromDiff;
 use function Functional\sort;
 
 function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'stylish')
 {
-    $arrayBefore = parseFile($pathToFile1);
-    $arrayAfter = parseFile($pathToFile2);
+    $contentsOfFile1 = readFile($pathToFile1);
+    $contentsOfFile2 = readFile($pathToFile2);
+
+    $extension1 = getExtension($pathToFile1);
+    $extension2 = getExtension($pathToFile2);
+
+    $arrayBefore = parse($contentsOfFile1, $extension1);
+    $arrayAfter = parse($contentsOfFile2, $extension2);
 
     $diff = createDiff($arrayBefore, $arrayAfter);
 
