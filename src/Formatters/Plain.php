@@ -10,16 +10,14 @@ use function Differ\Differ\getValueAfter;
 
 function formatDiff(array $diff): string
 {
-    $iter = function ($diff, array $parentElem) use (&$iter) {
-        return array_reduce($diff, function (array $acc, $item) use (&$iter, $parentElem) {
-            $key = getNodeKey($item);
-            $currentElem = [...$parentElem, $key];
-
+    $iter = function ($diff, array $propertyStack) use (&$iter) {
+        return array_reduce($diff, function (array $acc, $item) use (&$iter, $propertyStack) {
+            array_push($propertyStack, getNodeKey($item));
             return match (getNodeType($item)) {
-                'parent' => array_merge($acc, $iter(getChildren($item), $currentElem)),
-                'changed' => [...$acc, getLineChanged($item, $currentElem)],
-                'added' => [...$acc, getLineAdded($item, $currentElem)],
-                'deleted' => [...$acc, getLineRemoved($currentElem)],
+                'parent' => array_merge($acc, $iter(getChildren($item), $propertyStack)),
+                'changed' => [...$acc, genLineForChanged($item, $propertyStack)],
+                'added' => [...$acc, genLineForAdded($item, $propertyStack)],
+                'deleted' => [...$acc, genLineForRemoved($propertyStack)],
                 default => $acc
             };
         }, []);
@@ -30,11 +28,11 @@ function formatDiff(array $diff): string
     return implode(PHP_EOL, $lines);
 }
 
-function getLineChanged(array $item, array $stack)
+function genLineForChanged(array $item, array $stack)
 {
     $property = getProperty($stack);
-    $old = toStringPlain(getValueBefore($item));
-    $new = toStringPlain(getValueAfter($item));
+    $old = toString(getValueBefore($item));
+    $new = toString(getValueAfter($item));
     return "Property '{$property}' was updated. From {$old} to {$new}";
 }
 
@@ -43,7 +41,7 @@ function getProperty(array $stack)
     return implode('.', $stack);
 }
 
-function toStringPlain(mixed $value)
+function toString(mixed $value)
 {
     if (is_array($value)) {
         return '[complex value]';
@@ -54,14 +52,14 @@ function toStringPlain(mixed $value)
     return json_encode($value);
 }
 
-function getLineAdded(array $item, array $stack)
+function genLineForAdded(array $item, array $stack)
 {
     $property = getProperty($stack);
-    $value = toStringPlain(getValueAfter($item));
+    $value = toString(getValueAfter($item));
     return "Property '{$property}' was added with value: {$value}";
 }
 
-function getLineRemoved(array $stack)
+function genLineForRemoved(array $stack)
 {
     $property = getProperty($stack);
     return "Property '{$property}' was removed";
