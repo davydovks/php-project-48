@@ -27,34 +27,43 @@ function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'sty
 function createDiff(array $arrayBefore, array $arrayAfter)
 {
     return array_map(function ($key) use ($arrayBefore, $arrayAfter) {
-        $nodeKey = setNodeKey($key);
-
         if (
             isset($arrayBefore[$key]) && is_array($arrayBefore[$key])
             && isset($arrayAfter[$key]) && is_array($arrayAfter[$key])
         ) {
-            $children = setChildren(createDiff($arrayBefore[$key], $arrayAfter[$key]));
-            $nodeType = setNodeType('parent');
-            $node = array_merge($nodeKey, $children, $nodeType);
+            $node = [
+                'key' => $key,
+                'children' => createDiff($arrayBefore[$key], $arrayAfter[$key]),
+                'nodeType' => 'parent'
+            ];
+
             return $node;
         }
 
         $valueBefore = array_key_exists($key, $arrayBefore) ?
-            setValueBefore($arrayBefore[$key]) : [];
+            ['valueBefore' => $arrayBefore[$key]] : [];
         $valueAfter = array_key_exists($key, $arrayAfter) ?
-            setValueAfter($arrayAfter[$key]) : [];
+            ['valueAfter' => $arrayAfter[$key]] : [];
 
-        $nodeType = setNodeType(match (true) {
-            $valueBefore !== [] && $valueAfter === [] => 'deleted',
-            $valueBefore === [] && $valueAfter !== [] => 'added',
-            $valueBefore !== [] && $valueAfter !== []
-            && $arrayBefore[$key] !== $arrayAfter[$key] => 'changed',
-            $valueBefore !== [] && $valueAfter !== []
-            && $arrayBefore[$key] === $arrayAfter[$key] => 'unchanged',
-            default => throw new \LogicException("Unable to define node type")
-        });
+        $nodeType = [
+            'nodeType' => match (true) {
+                $valueBefore !== [] && $valueAfter === [] => 'deleted',
+                $valueBefore === [] && $valueAfter !== [] => 'added',
+                $valueBefore !== [] && $valueAfter !== []
+                && $arrayBefore[$key] !== $arrayAfter[$key] => 'changed',
+                $valueBefore !== [] && $valueAfter !== []
+                && $arrayBefore[$key] === $arrayAfter[$key] => 'unchanged',
+                default => throw new \LogicException("Unable to define node type")
+            }
+        ];
 
-        $node = array_merge($nodeKey, $valueBefore, $valueAfter, $nodeType);
+        $node = array_merge(
+            ['key' => $key],
+            $valueBefore,
+            $valueAfter,
+            $nodeType
+        );
+
         return $node;
     }, mergeKeys($arrayBefore, $arrayAfter));
 }
@@ -71,7 +80,7 @@ function readKeys(mixed $coll)
 }
 
 /**
- * Interface functions
+ * Getters
  */
 
 function getNodeKey(array $item)
@@ -97,29 +106,4 @@ function getValueAfter(array $item)
 function getNodeType(array $item)
 {
     return $item['nodeType'];
-}
-
-function setNodeKey(string $key)
-{
-    return ['key' => $key];
-}
-
-function setChildren(array $children)
-{
-    return ['children' => $children];
-}
-
-function setValueBefore(mixed $value)
-{
-    return ['valueBefore' => $value];
-}
-
-function setValueAfter(mixed $value)
-{
-    return ['valueAfter' => $value];
-}
-
-function setNodeType(string $type): array
-{
-    return ['nodeType' => $type];
 }
