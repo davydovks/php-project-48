@@ -45,8 +45,11 @@ function createDiff(array $arrayBefore, array $arrayAfter)
         $valueAfter = array_key_exists($key, $arrayAfter) ?
             ['valueAfter' => $arrayAfter[$key]] : [];
 
-        $nodeType = [
-            'nodeType' => match (true) {
+        $node = array_merge(
+            ['key' => $key],
+            $valueBefore,
+            $valueAfter,
+            ['nodeType' => match (true) {
                 $valueBefore !== [] && $valueAfter === [] => 'deleted',
                 $valueBefore === [] && $valueAfter !== [] => 'added',
                 $valueBefore !== [] && $valueAfter !== []
@@ -54,14 +57,7 @@ function createDiff(array $arrayBefore, array $arrayAfter)
                 $valueBefore !== [] && $valueAfter !== []
                 && $arrayBefore[$key] === $arrayAfter[$key] => 'unchanged',
                 default => throw new \LogicException("Unable to define node type")
-            }
-        ];
-
-        $node = array_merge(
-            ['key' => $key],
-            $valueBefore,
-            $valueAfter,
-            $nodeType
+            }]
         );
 
         return $node;
