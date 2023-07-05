@@ -4,7 +4,11 @@ namespace Differ\Files;
 
 function readFile(string $filename)
 {
-    return strval(file_get_contents($filename));
+    if (!file_exists($filename)) {
+        throw new \Exception("File not found: {$filename}");
+    }
+    
+    return (string) file_get_contents($filename);
 }
 
 function getExtension(string $filename): string
