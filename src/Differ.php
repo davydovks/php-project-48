@@ -6,7 +6,6 @@ use function Differ\Files\readFile;
 use function Differ\Files\getExtension;
 use function Differ\Parsers\parse;
 use function Differ\Formatters\genOutputFromDiff;
-use function Functional\retry;
 use function Functional\sort;
 
 function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'stylish')
