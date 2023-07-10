@@ -66,13 +66,8 @@ function createDiff(array $arrayBefore, array $arrayAfter)
 
 function mergeKeys(mixed $arr1, mixed $arr2)
 {
-    $keys = array_unique(array_merge(readKeys($arr1), readKeys($arr2)));
+    $keys = array_unique(array_merge(array_keys($arr1), array_keys($arr2)));
     return sort($keys, fn($left, $right) => $left <=> $right);
-}
-
-function readKeys(mixed $coll)
-{
-    return is_object($coll) ? get_object_vars($coll) : array_keys($coll);
 }
 
 /**
