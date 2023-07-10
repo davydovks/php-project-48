@@ -31,36 +31,49 @@ function createDiff(array $arrayBefore, array $arrayAfter)
             isset($arrayBefore[$key]) && is_array($arrayBefore[$key])
             && isset($arrayAfter[$key]) && is_array($arrayAfter[$key])
         ) {
-            $node = [
+            return [
                 'key' => $key,
                 'children' => createDiff($arrayBefore[$key], $arrayAfter[$key]),
                 'nodeType' => 'parent'
             ];
-
-            return $node;
         }
 
-        $valueBefore = array_key_exists($key, $arrayBefore) ?
-            ['valueBefore' => $arrayBefore[$key]] : [];
-        $valueAfter = array_key_exists($key, $arrayAfter) ?
-            ['valueAfter' => $arrayAfter[$key]] : [];
+        $valueBeforeExists = array_key_exists($key, $arrayBefore);
+        $valueAfterExists = array_key_exists($key, $arrayAfter);
 
-        $node = array_merge(
-            ['key' => $key],
-            $valueBefore,
-            $valueAfter,
-            ['nodeType' => match (true) {
-                $valueBefore !== [] && $valueAfter === [] => 'deleted',
-                $valueBefore === [] && $valueAfter !== [] => 'added',
-                $valueBefore !== [] && $valueAfter !== []
-                && $arrayBefore[$key] !== $arrayAfter[$key] => 'changed',
-                $valueBefore !== [] && $valueAfter !== []
-                && $arrayBefore[$key] === $arrayAfter[$key] => 'unchanged',
-                default => throw new \LogicException("Unable to define node type")
-            }]
-        );
+        if ($valueBeforeExists && !$valueAfterExists) {
+            return [
+                'key' => $key,
+                'valueBefore' => $arrayBefore[$key],
+                'nodeType' => 'deleted'
+            ];
+        }
 
-        return $node;
+        if (!$valueBeforeExists && $valueAfterExists) {
+            return [
+                'key' => $key,
+                'valueAfter' => $arrayAfter[$key],
+                'nodeType' => 'added'
+            ];
+        }
+
+        if ($arrayBefore[$key] !== $arrayAfter[$key]) {
+            return [
+                'key' => $key,
+                'valueBefore' => $arrayBefore[$key],
+                'valueAfter' => $arrayAfter[$key],
+                'nodeType' => 'changed'
+            ];
+        }
+
+        if ($arrayBefore[$key] === $arrayAfter[$key]) {
+            return [
+                'key' => $key,
+                'valueBefore' => $arrayBefore[$key],
+                'valueAfter' => $arrayAfter[$key],
+                'nodeType' => 'unchanged'
+            ];
+        }
     }, mergeKeys($arrayBefore, $arrayAfter));
 }
 
