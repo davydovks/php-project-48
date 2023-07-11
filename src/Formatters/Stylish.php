@@ -48,12 +48,6 @@ function formatDiff(array $diff): string
     return implode(PHP_EOL, ['{', ...$lines, '}']);
 }
 
-function markLine(string $str, string $mark, string $indent)
-{
-    $pos = strlen($indent) - 2;
-    return substr_replace($str, $mark, $pos, strlen($mark));
-}
-
 function generateLines(string $key, mixed $value, int $depth, string $mark = ' ')
 {
     $indent = str_repeat('    ', $depth);
@@ -72,6 +66,12 @@ function generateLines(string $key, mixed $value, int $depth, string $mark = ' '
         $newLine = markLine("{$indent}{$key}: {$strigifiedValue}", $mark, $indent);
         return [$newLine];
     }
+}
+
+function markLine(string $str, string $mark, string $indent)
+{
+    $pos = strlen($indent) - 2;
+    return substr_replace($str, $mark, $pos, strlen($mark));
 }
 
 function toString(mixed $value)
