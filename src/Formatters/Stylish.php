@@ -22,9 +22,9 @@ function formatDiff(array $diff): string
                     $addedLines = [$firstLine, ...$innerLines, $lastLine];
                     break;
                 case 'changed':
-                    $lineBefore = generateLines($key, getValueBefore($item), $depth, '-');
-                    $lineAfter = generateLines($key, getValueAfter($item), $depth, '+');
-                    $addedLines = [...$lineBefore, ...$lineAfter];
+                    $linesBefore = generateLines($key, getValueBefore($item), $depth, '-');
+                    $linesAfter = generateLines($key, getValueAfter($item), $depth, '+');
+                    $addedLines = [...$linesBefore, ...$linesAfter];
                     break;
                 case 'unchanged':
                     $addedLines = generateLines($key, getValueBefore($item), $depth);
