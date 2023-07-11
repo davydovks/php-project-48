@@ -27,16 +27,13 @@ function formatDiff(array $diff): string
                     $addedLines = [...$lineBefore, ...$lineAfter];
                     break;
                 case 'unchanged':
-                    $value = getValueBefore($item);
-                    $addedLines = generateLines($key, $value, $depth);
+                    $addedLines = generateLines($key, getValueBefore($item), $depth);
                     break;
                 case 'added':
-                    $value = getValueAfter($item);
-                    $addedLines = generateLines($key, $value, $depth, '+');
+                    $addedLines = generateLines($key, getValueAfter($item), $depth, '+');
                     break;
                 case 'deleted':
-                    $value = getValueBefore($item);
-                    $addedLines = generateLines($key, $value, $depth, '-');
+                    $addedLines = generateLines($key, getValueBefore($item), $depth, '-');
                     break;
                 default:
                     throw new \LogicException('Error in element with key: ' . $key);
