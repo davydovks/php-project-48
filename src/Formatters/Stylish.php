@@ -13,11 +13,13 @@ function formatDiff(array $diff): string
     $iter = function (array $coll, int $depth) use (&$iter) {
         return array_reduce($coll, function ($acc, $item) use ($depth, &$iter) {
             $key = getNodeKey($item);
+            $indent = str_repeat('    ', $depth);
             switch (getNodeType($item)) {
                 case 'parent':
+                    $firstLine = "{$indent}{$key}: {";
                     $innerLines = $iter(getChildren($item), $depth + 1);
-                    $allLines = genOutputForStructure($innerLines, $key, $depth);
-                    return array_merge($acc, $allLines);
+                    $lastLine = "{$indent}}";
+                    return [...$acc, $firstLine, ...$innerLines, $lastLine];
                 case 'changed':
                     $newAcc = genOutputForLeaf($item, $acc, $depth, '-');
                     return genOutputForLeaf($item, $newAcc, $depth, '+');
@@ -36,16 +38,6 @@ function formatDiff(array $diff): string
     $lines = $iter($diff, 1);
 
     return implode(PHP_EOL, ['{', ...$lines, '}']);
-}
-
-function genOutputForStructure(array $innerLines, string $key, int $depth, string $mark = ' ')
-{
-    $indent = getIndent($depth);
-
-    $firstLine = markLine("{$indent}{$key}: {", $mark, $indent);
-    $lastLine = "{$indent}}";
-
-    return [$firstLine, ...$innerLines, $lastLine];
 }
 
 function getIndent(int $depth)
@@ -67,16 +59,18 @@ function genOutputForLeaf(array $item, array $acc, int $depth, string $mark = ' 
 
 function generateLines(string $key, mixed $value, array $acc, int $depth, string $mark = ' ')
 {
+    $indent = getIndent($depth);
+
     if (is_array($value)) {
+        $firstLine = markLine("{$indent}{$key}: {", $mark, $indent);
         $innerLines = array_reduce(
             array_keys($value),
             fn($acc, $key) => generateLines($key, $value[$key], $acc, $depth + 1),
             []
         );
-        $allLines = genOutputForStructure($innerLines, $key, $depth, $mark);
-        return array_merge($acc, $allLines);
+        $lastLine = "{$indent}}";
+        return [...$acc, $firstLine, ...$innerLines, $lastLine];
     } else {
-        $indent = getIndent($depth);
         $strigifiedValue = toString($value);
         $newLine = markLine("{$indent}{$key}: {$strigifiedValue}", $mark, $indent);
         return [...$acc, $newLine];
