@@ -19,19 +19,30 @@ function formatDiff(array $diff): string
                     $firstLine = "{$indent}{$key}: {";
                     $innerLines = $iter(getChildren($item), $depth + 1);
                     $lastLine = "{$indent}}";
-                    return [...$acc, $firstLine, ...$innerLines, $lastLine];
+                    $addedLines = [$firstLine, ...$innerLines, $lastLine];
+                    break;
                 case 'changed':
-                    $newAcc = genOutputForLeaf($item, $acc, $depth, '-');
-                    return genOutputForLeaf($item, $newAcc, $depth, '+');
+                    $lineBefore = generateLines($key, getValueBefore($item), $depth, '-');
+                    $lineAfter = generateLines($key, getValueAfter($item), $depth, '+');
+                    $addedLines = [...$lineBefore, ...$lineAfter];
+                    break;
                 case 'unchanged':
-                    return genOutputForLeaf($item, $acc, $depth);
+                    $value = getValueBefore($item);
+                    $addedLines = generateLines($key, $value, $depth);
+                    break;
                 case 'added':
-                    return genOutputForLeaf($item, $acc, $depth, '+');
+                    $value = getValueAfter($item);
+                    $addedLines = generateLines($key, $value, $depth, '+');
+                    break;
                 case 'deleted':
-                    return genOutputForLeaf($item, $acc, $depth, '-');
+                    $value = getValueBefore($item);
+                    $addedLines = generateLines($key, $value, $depth, '-');
+                    break;
                 default:
                     throw new \LogicException('Error in element with key: ' . $key);
             }
+
+            return array_merge($acc, $addedLines);
         }, []);
     };
 
@@ -46,13 +57,7 @@ function markLine(string $str, string $mark, string $indent)
     return substr_replace($str, $mark, $pos, strlen($mark));
 }
 
-function genOutputForLeaf(array $item, array $acc, int $depth, string $mark = ' ')
-{
-    $value = $mark === '+' ? getValueAfter($item) : getValueBefore($item);
-    return generateLines(getNodeKey($item), $value, $acc, $depth, $mark);
-}
-
-function generateLines(string $key, mixed $value, array $acc, int $depth, string $mark = ' ')
+function generateLines(string $key, mixed $value, int $depth, string $mark = ' ')
 {
     $indent = str_repeat('    ', $depth);
 
@@ -60,15 +65,15 @@ function generateLines(string $key, mixed $value, array $acc, int $depth, string
         $firstLine = markLine("{$indent}{$key}: {", $mark, $indent);
         $innerLines = array_reduce(
             array_keys($value),
-            fn($acc, $key) => generateLines($key, $value[$key], $acc, $depth + 1),
+            fn($acc, $key) => [...$acc, ...generateLines($key, $value[$key], $depth + 1)],
             []
         );
         $lastLine = "{$indent}}";
-        return [...$acc, $firstLine, ...$innerLines, $lastLine];
+        return [$firstLine, ...$innerLines, $lastLine];
     } else {
         $strigifiedValue = toString($value);
         $newLine = markLine("{$indent}{$key}: {$strigifiedValue}", $mark, $indent);
-        return [...$acc, $newLine];
+        return [$newLine];
     }
 }
 
