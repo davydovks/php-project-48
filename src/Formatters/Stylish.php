@@ -80,6 +80,5 @@ function toString(mixed $value)
         return trim(var_export($value, true), "'");
     }
 
-    $stringifiedNullAndBoolean = json_encode($value);
-    return $stringifiedNullAndBoolean;
+    return json_encode($value);
 }
