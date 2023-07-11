@@ -40,11 +40,6 @@ function formatDiff(array $diff): string
     return implode(PHP_EOL, ['{', ...$lines, '}']);
 }
 
-function getIndent(int $depth)
-{
-    return str_repeat('    ', $depth);
-}
-
 function markLine(string $str, string $mark, string $indent)
 {
     $pos = strlen($indent) - 2;
@@ -59,7 +54,7 @@ function genOutputForLeaf(array $item, array $acc, int $depth, string $mark = ' 
 
 function generateLines(string $key, mixed $value, array $acc, int $depth, string $mark = ' ')
 {
-    $indent = getIndent($depth);
+    $indent = str_repeat('    ', $depth);
 
     if (is_array($value)) {
         $firstLine = markLine("{$indent}{$key}: {", $mark, $indent);
