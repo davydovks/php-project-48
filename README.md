@@ -1,6 +1,4 @@
-# php-project-48 | gendiff
-
-### Hexlet tests and linter status:
+# gendiff
 
 [![Actions Status](https://github.com/davydovks/php-project-48/workflows/hexlet-check/badge.svg)](https://github.com/davydovks/php-project-48/actions)
 [![Maintainability](https://api.codeclimate.com/v1/badges/00cecdd036295d3f8eb7/maintainability)](https://codeclimate.com/github/davydovks/php-project-48/maintainability)
@@ -8,7 +6,7 @@
 
 ## About
 
-The program compares two configuration files and shows a difference. It can be used both in terminal and as a library. Acceptable input file formats are JSON and YAML.
+Gendiff compares two configuration files and shows a difference. It can be used both in terminal and as a library. Acceptable input file formats are JSON and YAML.
 
 ## Setup
 
@@ -59,14 +57,25 @@ Options:
   -f, --format <fmt>            Report format [default: stylish]
 ```
 
-#### Examples
+### Demos
 
-Comparing two plain JSON files, stylish output (step 3): [![asciicast](https://asciinema.org/a/581932.svg)](https://asciinema.org/a/581932)
+<details><summary>Comparing two plain JSON files, stylish output</summary>
 
-Comparing two plain YAML files, stylish output (step 5): [![asciicast](https://asciinema.org/a/583851.svg)](https://asciinema.org/a/583851)
+[![asciicast](https://asciinema.org/a/581932.svg)](https://asciinema.org/a/581932)
+</details>
+<details><summary>Comparing two plain YAML files, stylish output</summary> 
 
-Comparing multilevel JSON and YAML files, stylish output (step 6): [![asciicast](https://asciinema.org/a/587283.svg)](https://asciinema.org/a/587283)
+[![asciicast](https://asciinema.org/a/583851.svg)](https://asciinema.org/a/583851)
+</details>
+<details><summary>Comparing multilevel JSON and YAML files, stylish output</summary> 
 
-Comparing two multilevel JSON files, plain output (step 7): [![asciicast](https://asciinema.org/a/587351.svg)](https://asciinema.org/a/587351)
+[![asciicast](https://asciinema.org/a/587283.svg)](https://asciinema.org/a/587283)
+</details>
+<details><summary>Comparing two multilevel JSON files, plain output</summary> 
 
-Comparing multilevel JSON and YAML files, all output formats (step 8): [![asciicast](https://asciinema.org/a/587524.svg)](https://asciinema.org/a/587524)
+[![asciicast](https://asciinema.org/a/587351.svg)](https://asciinema.org/a/587351)
+</details>
+<details><summary>Comparing multilevel JSON and YAML files, all output formats</summary> 
+
+[![asciicast](https://asciinema.org/a/587524.svg)](https://asciinema.org/a/587524)
+</details>
